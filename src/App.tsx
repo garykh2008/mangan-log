@@ -11,6 +11,20 @@ import { LogOut, Activity, User, LayoutDashboard, HeartPulse, Weight, Utensils, 
 function AppContent() {
   const { user, loading, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<string>('dashboard')
+  const [openModalTab, setOpenModalTab] = useState<string | null>(null)
+
+  const handleTabChange = (tab: string, triggerModal = false) => {
+    setActiveTab(tab)
+    if (triggerModal) {
+      setOpenModalTab(tab)
+    } else {
+      setOpenModalTab(null)
+    }
+  }
+
+  const handleModalOpened = () => {
+    setOpenModalTab(null)
+  }
 
   if (loading) {
     return (
@@ -52,11 +66,26 @@ function AppContent() {
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-md w-full mx-auto px-4 py-6">
-        {activeTab === 'dashboard' && <Dashboard onTabChange={setActiveTab} />}
+        {activeTab === 'dashboard' && <Dashboard onTabChange={handleTabChange} />}
         {activeTab === 'medical' && <MedicalTab />}
-        {activeTab === 'biometrics' && <BiometricsTab />}
-        {activeTab === 'diet' && <DietTab />}
-        {activeTab === 'workout' && <WorkoutTab />}
+        {activeTab === 'biometrics' && (
+          <BiometricsTab 
+            autoOpen={openModalTab === 'biometrics'} 
+            onModalOpened={handleModalOpened} 
+          />
+        )}
+        {activeTab === 'diet' && (
+          <DietTab 
+            autoOpen={openModalTab === 'diet'} 
+            onModalOpened={handleModalOpened} 
+          />
+        )}
+        {activeTab === 'workout' && (
+          <WorkoutTab 
+            autoOpen={openModalTab === 'workout'} 
+            onModalOpened={handleModalOpened} 
+          />
+        )}
       </main>
 
       {/* Responsive Bottom Navigation Bar */}
@@ -64,7 +93,7 @@ function AppContent() {
         <div className="max-w-md w-full flex justify-around px-2">
           {/* Dashboard Tab */}
           <button
-            onClick={() => setActiveTab('dashboard')}
+            onClick={() => handleTabChange('dashboard')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
               activeTab === 'dashboard' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
@@ -75,7 +104,7 @@ function AppContent() {
 
           {/* Medical Tab */}
           <button
-            onClick={() => setActiveTab('medical')}
+            onClick={() => handleTabChange('medical')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
               activeTab === 'medical' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
@@ -86,7 +115,7 @@ function AppContent() {
 
           {/* Biometrics Tab */}
           <button
-            onClick={() => setActiveTab('biometrics')}
+            onClick={() => handleTabChange('biometrics')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
               activeTab === 'biometrics' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
@@ -97,7 +126,7 @@ function AppContent() {
 
           {/* Diet Tab */}
           <button
-            onClick={() => setActiveTab('diet')}
+            onClick={() => handleTabChange('diet')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
               activeTab === 'diet' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
@@ -108,7 +137,7 @@ function AppContent() {
 
           {/* Workout Tab */}
           <button
-            onClick={() => setActiveTab('workout')}
+            onClick={() => handleTabChange('workout')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
               activeTab === 'workout' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}

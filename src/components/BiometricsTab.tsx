@@ -3,7 +3,12 @@ import { biometricsService, uploadImage, type BiometricsLog } from '../services/
 import { useAuth } from '../contexts/AuthContext'
 import { Weight, Camera, Trash2, Edit2, Plus, Loader2, Image as ImageIcon, Eye, X } from 'lucide-react'
 
-export const BiometricsTab: React.FC = () => {
+interface BiometricsTabProps {
+  autoOpen?: boolean
+  onModalOpened?: () => void
+}
+
+export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalOpened }) => {
   const { user } = useAuth()
   const [logs, setLogs] = useState<BiometricsLog[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -39,6 +44,13 @@ export const BiometricsTab: React.FC = () => {
   useEffect(() => {
     loadLogs()
   }, [])
+
+  useEffect(() => {
+    if (autoOpen) {
+      handleOpenAdd()
+      onModalOpened?.()
+    }
+  }, [autoOpen])
 
   const handleOpenAdd = () => {
     setEditingLog(null)
@@ -133,7 +145,7 @@ export const BiometricsTab: React.FC = () => {
       <div className="flex items-center justify-between pb-4 border-b border-slate-900">
         <div className="flex items-center space-x-2.5">
           <div className="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
-            <Weight className="w-5 h-5 animate-pulse" />
+            <Weight className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-black text-white">身體數據管理</h2>
         </div>

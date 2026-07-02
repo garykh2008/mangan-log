@@ -2,7 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { workoutService, type WorkoutLog } from '../services/db'
 import { Dumbbell, Star, Trash2, Edit2, Plus, Loader2, Clock, MessageSquare, X } from 'lucide-react'
 
-export const WorkoutTab: React.FC = () => {
+interface WorkoutTabProps {
+  autoOpen?: boolean
+  onModalOpened?: () => void
+}
+
+export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened }) => {
   const [logs, setLogs] = useState<WorkoutLog[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [editingLog, setEditingLog] = useState<WorkoutLog | null>(null)
@@ -33,6 +38,13 @@ export const WorkoutTab: React.FC = () => {
   useEffect(() => {
     loadLogs()
   }, [])
+
+  useEffect(() => {
+    if (autoOpen) {
+      handleOpenAdd()
+      onModalOpened?.()
+    }
+  }, [autoOpen])
 
   const handleOpenAdd = () => {
     setEditingLog(null)
@@ -113,7 +125,7 @@ export const WorkoutTab: React.FC = () => {
       <div className="flex items-center justify-between pb-4 border-b border-slate-900">
         <div className="flex items-center space-x-2.5">
           <div className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl">
-            <Dumbbell className="w-5 h-5 animate-pulse" />
+            <Dumbbell className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-black text-white">運動記錄管理</h2>
         </div>

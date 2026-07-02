@@ -78,7 +78,7 @@ export const medicationService = {
     return data || []
   },
 
-  async addLog(log: Omit<MedicationLog, 'id' | 'created_at' | 'user_id'>): Promise<MedicationLog> {
+  async addLog(log: Omit<MedicationLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }): Promise<MedicationLog> {
     const { data, error } = await supabase
       .from('medication_logs')
       .insert([log])
@@ -88,7 +88,7 @@ export const medicationService = {
     return data
   },
 
-  async updateLog(id: string, log: Partial<Omit<MedicationLog, 'id' | 'created_at' | 'user_id'>>): Promise<MedicationLog> {
+  async updateLog(id: string, log: Partial<Omit<MedicationLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }>): Promise<MedicationLog> {
     const { data, error } = await supabase
       .from('medication_logs')
       .update(log)
@@ -119,7 +119,7 @@ export const biometricsService = {
     return data || []
   },
 
-  async addLog(log: Omit<BiometricsLog, 'id' | 'created_at' | 'user_id'>): Promise<BiometricsLog> {
+  async addLog(log: Omit<BiometricsLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }): Promise<BiometricsLog> {
     const { data, error } = await supabase
       .from('biometrics_logs')
       .insert([log])
@@ -129,7 +129,7 @@ export const biometricsService = {
     return data
   },
 
-  async updateLog(id: string, log: Partial<Omit<BiometricsLog, 'id' | 'created_at' | 'user_id'>>): Promise<BiometricsLog> {
+  async updateLog(id: string, log: Partial<Omit<BiometricsLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }>): Promise<BiometricsLog> {
     const { data, error } = await supabase
       .from('biometrics_logs')
       .update(log)
@@ -160,7 +160,7 @@ export const dietService = {
     return data || []
   },
 
-  async addLog(log: Omit<DietLog, 'id' | 'created_at' | 'user_id'>): Promise<DietLog> {
+  async addLog(log: Omit<DietLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }): Promise<DietLog> {
     const { data, error } = await supabase
       .from('diet_logs')
       .insert([log])
@@ -170,7 +170,7 @@ export const dietService = {
     return data
   },
 
-  async updateLog(id: string, log: Partial<Omit<DietLog, 'id' | 'created_at' | 'user_id'>>): Promise<DietLog> {
+  async updateLog(id: string, log: Partial<Omit<DietLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }>): Promise<DietLog> {
     const { data, error } = await supabase
       .from('diet_logs')
       .update(log)
@@ -201,7 +201,7 @@ export const workoutService = {
     return data || []
   },
 
-  async addLog(log: Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'>): Promise<WorkoutLog> {
+  async addLog(log: Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }): Promise<WorkoutLog> {
     const { data, error } = await supabase
       .from('workout_logs')
       .insert([log])
@@ -211,7 +211,7 @@ export const workoutService = {
     return data
   },
 
-  async updateLog(id: string, log: Partial<Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'>>): Promise<WorkoutLog> {
+  async updateLog(id: string, log: Partial<Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'> & { created_at?: string }>): Promise<WorkoutLog> {
     const { data, error } = await supabase
       .from('workout_logs')
       .update(log)

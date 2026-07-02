@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { dietService, uploadImage, type DietLog } from '../services/db'
 import { useAuth } from '../contexts/AuthContext'
-import { Utensils, Camera, Trash2, Edit2, Plus, Loader2, Award, Coffee, X } from 'lucide-react'
+import { Utensils, Camera, Trash2, Edit2, Plus, Loader2, Award, Coffee, X, Calendar } from 'lucide-react'
 
-export const DietTab: React.FC = () => {
+interface DietTabProps {
+  autoOpen?: boolean
+  onModalOpened?: () => void
+}
+
+export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => {
   const { user } = useAuth()
   const [logs, setLogs] = useState<DietLog[]>([])
   const [isOpen, setIsOpen] = useState(false)
@@ -11,6 +16,15 @@ export const DietTab: React.FC = () => {
   
   // Sub tab in modal: 'general' | 'protein' | 'coffee'
   const [subTab, setSubTab] = useState<'general' | 'protein' | 'coffee'>('general')
+
+  // Helper to format date into YYYY-MM-DDTHH:mm local string
+  const formatDatetimeLocal = (date: Date) => {
+    const tzOffset = date.getTimezoneOffset() * 60000
+    return new Date(date.getTime() - tzOffset).toISOString().slice(0, 16)
+  }
+
+  // Common Form States
+  const [createdAt, setCreatedAt] = useState(formatDatetimeLocal(new Date()))
 
   // Form states - General
   const [mealType, setMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast')
@@ -27,7 +41,7 @@ export const DietTab: React.FC = () => {
   const [coffeeBean, setCoffeeBean] = useState('')
   const [coffeeVolume, setCoffeeVolume] = useState('350')
 
-  // Common Form States
+  // Photo Form States
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null)
@@ -53,6 +67,13 @@ export const DietTab: React.FC = () => {
     loadLogs()
   }, [])
 
+  useEffect(() => {
+    if (autoOpen) {
+      handleOpenAdd()
+      onModalOpened?.()
+    }
+  }, [autoOpen])
+
   const handleOpenAdd = () => {
     setEditingLog(null)
     setSubTab('general')
@@ -70,6 +91,9 @@ export const DietTab: React.FC = () => {
     setCoffeeBean('')
     setCoffeeVolume('350')
     
+    // Record Time reset
+    setCreatedAt(formatDatetimeLocal(new Date()))
+    
     setPhotoFile(null)
     setPhotoPreview(null)
     setExistingPhotoUrl(null)
@@ -83,6 +107,9 @@ export const DietTab: React.FC = () => {
     setPhotoFile(null)
     setPhotoPreview(null)
     setExistingPhotoUrl(log.photo_url)
+    
+    // Load custom log created_at time
+    setCreatedAt(formatDatetimeLocal(new Date(log.created_at)))
 
     // Check if it is a formatted protein log
     if (log.is_high_protein && log.food_text.startsWith('🥤')) {
@@ -160,6 +187,9 @@ export const DietTab: React.FC = () => {
         finalHasCoffee = true
       }
 
+      // Convert custom local datetime-local back to ISO string
+      const recordTimestamp = new Date(createdAt).toISOString()
+
       if (editingLog) {
         // Edit Mode
         await dietService.updateLog(editingLog.id, {
@@ -168,6 +198,7 @@ export const DietTab: React.FC = () => {
           photo_url: finalPhotoUrl,
           is_high_protein: finalIsHighProtein,
           has_coffee: finalHasCoffee,
+          created_at: recordTimestamp,
         })
       } else {
         // Add Mode
@@ -177,6 +208,7 @@ export const DietTab: React.FC = () => {
           photo_url: finalPhotoUrl,
           is_high_protein: finalIsHighProtein,
           has_coffee: finalHasCoffee,
+          created_at: recordTimestamp,
         })
       }
 
@@ -283,7 +315,7 @@ export const DietTab: React.FC = () => {
       <div className="flex items-center justify-between pb-4 border-b border-slate-900">
         <div className="flex items-center space-x-2.5">
           <div className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl">
-            <Utensils className="w-5 h-5 animate-pulse" />
+            <Utensils className="w-5 h-5" />
           </div>
           <h2 className="text-xl font-black text-white">飲食記錄管理</h2>
         </div>
@@ -370,16 +402,27 @@ export const DietTab: React.FC = () => {
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
-            <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
+            
+            {/* Header row containing title and X close button to avoid overlap */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-850">
+              <div className="flex items-center space-x-2">
+                <Utensils className="w-5 h-5 text-emerald-400" />
+                <h3 className="font-bold text-white text-base">
+                  {editingLog ? '修改飲食紀錄' : '記錄今日飲食'}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* Sub-tabs Selection inside Modal */}
             {!editingLog ? (
-              <div className="flex p-1 bg-slate-950/80 rounded-xl border border-slate-800/80">
+              <div className="flex p-1 bg-slate-950/80 rounded-xl border border-slate-800/80 mt-1">
                 <button
                   type="button"
                   onClick={() => setSubTab('general')}
@@ -409,11 +452,11 @@ export const DietTab: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="text-center pb-2 border-b border-slate-850">
-                <span className="text-xs font-extrabold text-slate-400">
-                  {subTab === 'protein' && '🥤 編輯高蛋白紀錄'}
-                  {subTab === 'coffee' && '☕ 編輯咖啡紀錄'}
-                  {subTab === 'general' && '🍳 編輯一般飲食紀錄'}
+              <div className="text-center pb-1">
+                <span className="text-xs font-extrabold text-emerald-400">
+                  {subTab === 'protein' && '🥤 正在編輯高蛋白紀錄'}
+                  {subTab === 'coffee' && '☕ 正在編輯咖啡紀錄'}
+                  {subTab === 'general' && '🍳 正在編輯一般飲食紀錄'}
                 </span>
               </div>
             )}
@@ -480,6 +523,45 @@ export const DietTab: React.FC = () => {
                         <span className="text-xs font-semibold">喝了咖啡</span>
                       </div>
                     </label>
+                  </div>
+
+                  {/* Photo upload */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">食物相片</label>
+                    <div className="flex items-center space-x-4">
+                      <label className="flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-3 py-2 rounded-xl cursor-pointer transition text-xs font-semibold">
+                        <Camera className="w-3.5 h-3.5 text-purple-400" />
+                        <span>選擇照片</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePhotoChange}
+                          className="hidden"
+                        />
+                      </label>
+
+                      {(photoPreview || existingPhotoUrl) && (
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-800">
+                          <img 
+                            src={photoPreview || existingPhotoUrl!} 
+                            alt="Preview" 
+                            className="w-full h-full object-cover" 
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPhotoFile(null)
+                              setPhotoPreview(null)
+                              setExistingPhotoUrl(null)
+                            }}
+                            className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition cursor-pointer"
+                            title="清除相片"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}
@@ -559,46 +641,20 @@ export const DietTab: React.FC = () => {
                 </div>
               )}
 
-              {/* Common: Photo upload (Only relevant for general diet tab or existing edits) */}
-              {subTab === 'general' && (
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">食物相片</label>
-                  <div className="flex items-center space-x-4">
-                    <label className="flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-3 py-2 rounded-xl cursor-pointer transition text-xs font-semibold">
-                      <Camera className="w-3.5 h-3.5 text-purple-400" />
-                      <span>選擇照片</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoChange}
-                        className="hidden"
-                      />
-                    </label>
-
-                    {(photoPreview || existingPhotoUrl) && (
-                      <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-800">
-                        <img 
-                          src={photoPreview || existingPhotoUrl!} 
-                          alt="Preview" 
-                          className="w-full h-full object-cover" 
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPhotoFile(null)
-                            setPhotoPreview(null)
-                            setExistingPhotoUrl(null)
-                          }}
-                          className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition cursor-pointer"
-                          title="清除相片"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+              {/* Generic Custom Record Time (Editable for all sub-tabs) */}
+              <div className="space-y-2 pt-2 border-t border-slate-850">
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
+                  <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                  <span>記錄時間 (可修改歷史時間)</span>
+                </label>
+                <input
+                  type="datetime-local"
+                  required
+                  value={createdAt}
+                  onChange={(e) => setCreatedAt(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                />
+              </div>
 
               <button
                 type="submit"
