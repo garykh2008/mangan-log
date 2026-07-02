@@ -8,12 +8,26 @@ export const DietTab: React.FC = () => {
   const [logs, setLogs] = useState<DietLog[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [editingLog, setEditingLog] = useState<DietLog | null>(null)
+  
+  // Sub tab in modal: 'general' | 'protein' | 'coffee'
+  const [subTab, setSubTab] = useState<'general' | 'protein' | 'coffee'>('general')
 
-  // Form states
+  // Form states - General
   const [mealType, setMealType] = useState<'Breakfast' | 'Lunch' | 'Dinner' | 'Snack'>('Breakfast')
   const [foodText, setFoodText] = useState('')
   const [isHighProtein, setIsHighProtein] = useState(false)
   const [hasCoffee, setHasCoffee] = useState(false)
+  
+  // Form states - Protein Quick Log
+  const [protein, setProtein] = useState('25')
+  const [proteinVolume, setProteinVolume] = useState('300')
+  const [proteinFlavor, setProteinFlavor] = useState('')
+
+  // Form states - Coffee Quick Log
+  const [coffeeBean, setCoffeeBean] = useState('')
+  const [coffeeVolume, setCoffeeVolume] = useState('350')
+
+  // Common Form States
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null)
@@ -41,10 +55,21 @@ export const DietTab: React.FC = () => {
 
   const handleOpenAdd = () => {
     setEditingLog(null)
+    setSubTab('general')
     setMealType('Breakfast')
     setFoodText('')
     setIsHighProtein(false)
     setHasCoffee(false)
+    
+    // Protein reset
+    setProtein('25')
+    setProteinVolume('300')
+    setProteinFlavor('')
+    
+    // Coffee reset
+    setCoffeeBean('')
+    setCoffeeVolume('350')
+    
     setPhotoFile(null)
     setPhotoPreview(null)
     setExistingPhotoUrl(null)
@@ -54,14 +79,42 @@ export const DietTab: React.FC = () => {
 
   const handleOpenEdit = (log: DietLog) => {
     setEditingLog(log)
-    setMealType(log.meal_type)
-    setFoodText(log.food_text)
-    setIsHighProtein(log.is_high_protein)
-    setHasCoffee(log.has_coffee)
+    setError(null)
     setPhotoFile(null)
     setPhotoPreview(null)
     setExistingPhotoUrl(log.photo_url)
-    setError(null)
+
+    // Check if it is a formatted protein log
+    if (log.is_high_protein && log.food_text.startsWith('🥤')) {
+      setSubTab('protein')
+      const parts = log.food_text.split('|').map(p => p.trim())
+      const pMatch = parts.find(p => p.startsWith('蛋白質:'))
+      const vMatch = parts.find(p => p.startsWith('容量:'))
+      const fMatch = parts.find(p => p.startsWith('口味/品牌:'))
+
+      setProtein(pMatch ? pMatch.replace('蛋白質:', '').replace('g', '').trim() : '25')
+      setProteinVolume(vMatch ? vMatch.replace('容量:', '').replace('ml', '').trim() : '300')
+      setProteinFlavor(fMatch ? fMatch.replace('口味/品牌:', '').trim() : '')
+    } 
+    // Check if it is a formatted coffee log
+    else if (log.has_coffee && log.food_text.startsWith('☕')) {
+      setSubTab('coffee')
+      const parts = log.food_text.split('|').map(p => p.trim())
+      const bMatch = parts.find(p => p.startsWith('品項:'))
+      const vMatch = parts.find(p => p.startsWith('容量:'))
+
+      setCoffeeBean(bMatch ? bMatch.replace('品項:', '').trim() : '')
+      setCoffeeVolume(vMatch ? vMatch.replace('容量:', '').replace('ml', '').trim() : '350')
+    } 
+    // Standard meal log
+    else {
+      setSubTab('general')
+      setMealType(log.meal_type)
+      setFoodText(log.food_text)
+      setIsHighProtein(log.is_high_protein)
+      setHasCoffee(log.has_coffee)
+    }
+
     setIsOpen(true)
   }
 
@@ -90,23 +143,40 @@ export const DietTab: React.FC = () => {
         finalPhotoUrl = uploadedUrl
       }
 
+      let finalFoodText = foodText
+      let finalMealType = mealType
+      let finalIsHighProtein = isHighProtein
+      let finalHasCoffee = hasCoffee
+
+      if (subTab === 'protein') {
+        finalFoodText = `🥤 高蛋白補充 | 蛋白質: ${protein}g | 容量: ${proteinVolume}ml | 口味/品牌: ${proteinFlavor || '原味'}`
+        finalMealType = 'Snack'
+        finalIsHighProtein = true
+        finalHasCoffee = false
+      } else if (subTab === 'coffee') {
+        finalFoodText = `☕ 咖啡時間 | 品項: ${coffeeBean || '美式咖啡'} | 容量: ${coffeeVolume}ml`
+        finalMealType = 'Snack'
+        finalIsHighProtein = false
+        finalHasCoffee = true
+      }
+
       if (editingLog) {
         // Edit Mode
         await dietService.updateLog(editingLog.id, {
-          meal_type: mealType,
-          food_text: foodText,
+          meal_type: finalMealType,
+          food_text: finalFoodText,
           photo_url: finalPhotoUrl,
-          is_high_protein: isHighProtein,
-          has_coffee: hasCoffee,
+          is_high_protein: finalIsHighProtein,
+          has_coffee: finalHasCoffee,
         })
       } else {
         // Add Mode
         await dietService.addLog({
-          meal_type: mealType,
-          food_text: foodText,
+          meal_type: finalMealType,
+          food_text: finalFoodText,
           photo_url: finalPhotoUrl,
-          is_high_protein: isHighProtein,
-          has_coffee: hasCoffee,
+          is_high_protein: finalIsHighProtein,
+          has_coffee: finalHasCoffee,
         })
       }
 
@@ -135,7 +205,76 @@ export const DietTab: React.FC = () => {
     Breakfast: '早餐 🍳',
     Lunch: '午餐 🥗',
     Dinner: '晚餐 🍲',
-    Snack: '點心/點心 🍏',
+    Snack: '點心/補充 🍏',
+  }
+
+  // Helper to render customized text styling in history cards
+  const renderLogContent = (log: DietLog) => {
+    // Protein Log Formatting
+    if (log.is_high_protein && log.food_text.startsWith('🥤')) {
+      const parts = log.food_text.split('|').map(p => p.trim())
+      const pMatch = parts.find(p => p.startsWith('蛋白質:'))?.replace('蛋白質:', '')
+      const vMatch = parts.find(p => p.startsWith('容量:'))?.replace('容量:', '')
+      const fMatch = parts.find(p => p.startsWith('口味/品牌:'))?.replace('口味/品牌:', '')
+      
+      return (
+        <div className="space-y-1">
+          <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
+            <span>🥤 高蛋白補充</span>
+            <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-emerald-300">
+              {pMatch || '25g'}
+            </span>
+          </div>
+          <p className="text-xs text-slate-300 font-semibold leading-relaxed">
+            容量：{vMatch || '300ml'} • 口味：{fMatch || '原味'}
+          </p>
+        </div>
+      )
+    }
+
+    // Coffee Log Formatting
+    if (log.has_coffee && log.food_text.startsWith('☕')) {
+      const parts = log.food_text.split('|').map(p => p.trim())
+      const bMatch = parts.find(p => p.startsWith('品項:'))?.replace('品項:', '')
+      const vMatch = parts.find(p => p.startsWith('容量:'))?.replace('容量:', '')
+
+      return (
+        <div className="space-y-1">
+          <div className="flex items-center space-x-1.5 text-amber-400 font-bold">
+            <span>☕ 咖啡時間</span>
+            <span className="text-xs px-2 py-0.5 bg-amber-500/10 rounded-full border border-amber-500/20 text-amber-300">
+              {vMatch || '350ml'}
+            </span>
+          </div>
+          <p className="text-xs text-slate-300 font-semibold leading-relaxed">
+            品項/豆子：{bMatch || '美式咖啡'}
+          </p>
+        </div>
+      )
+    }
+
+    // Standard Food Log
+    return (
+      <div className="space-y-2">
+        <p className="text-sm text-slate-200 leading-relaxed font-semibold">
+          {log.food_text}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {log.is_high_protein && (
+            <span className="inline-flex items-center space-x-1 text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <Award className="w-3 h-3" />
+              <span>補高蛋白</span>
+            </span>
+          )}
+          {log.has_coffee && (
+            <span className="inline-flex items-center space-x-1 text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded-full border border-amber-500/20">
+              <Coffee className="w-3 h-3" />
+              <span>喝咖啡</span>
+            </span>
+          )}
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -186,7 +325,7 @@ export const DietTab: React.FC = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <span className="font-extrabold text-white text-xs bg-slate-900 border border-slate-800/80 px-2 py-0.5 rounded-lg">
-                      {mealTypeTranslations[log.meal_type] || log.meal_type}
+                      {mealTypeTranslations[log.meal_type as keyof typeof mealTypeTranslations] || log.meal_type}
                     </span>
                     <span className="text-[9px] text-slate-500 font-bold">
                       {new Date(log.created_at).toLocaleString()}
@@ -217,25 +356,8 @@ export const DietTab: React.FC = () => {
                       <img src={log.photo_url} alt="Food" className="w-full h-full object-cover" />
                     </div>
                   )}
-                  <div className="flex-1 space-y-2">
-                    <p className="text-sm text-slate-200 leading-relaxed font-semibold">
-                      {log.food_text}
-                    </p>
-                    {/* Badges */}
-                    <div className="flex flex-wrap gap-2">
-                      {log.is_high_protein && (
-                        <span className="inline-flex items-center space-x-1 text-[10px] bg-emerald-500/10 text-emerald-400 font-bold px-2 py-0.5 rounded-full border border-emerald-500/20">
-                          <Award className="w-3 h-3" />
-                          <span>補高蛋白</span>
-                        </span>
-                      )}
-                      {log.has_coffee && (
-                        <span className="inline-flex items-center space-x-1 text-[10px] bg-amber-500/10 text-amber-400 font-bold px-2 py-0.5 rounded-full border border-amber-500/20">
-                          <Coffee className="w-3 h-3" />
-                          <span>喝咖啡</span>
-                        </span>
-                      )}
-                    </div>
+                  <div className="flex-1">
+                    {renderLogContent(log)}
                   </div>
                 </div>
               </div>
@@ -255,112 +377,228 @@ export const DietTab: React.FC = () => {
               <X className="w-4 h-4" />
             </button>
 
-            <div className="flex items-center space-x-2 pb-2 border-b border-slate-800">
-              <Utensils className="w-5 h-5 text-emerald-400 animate-pulse" />
-              <h2 className="text-base font-bold text-white">
-                {editingLog ? '修改飲食紀錄' : '記錄今日飲食'}
-              </h2>
-            </div>
+            {/* Sub-tabs Selection inside Modal */}
+            {!editingLog ? (
+              <div className="flex p-1 bg-slate-950/80 rounded-xl border border-slate-800/80">
+                <button
+                  type="button"
+                  onClick={() => setSubTab('general')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
+                    subTab === 'general' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  一般飲食
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSubTab('protein')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
+                    subTab === 'protein' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  🥤 高蛋白
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSubTab('coffee')}
+                  className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
+                    subTab === 'coffee' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                  }`}
+                >
+                  ☕ 咖啡
+                </button>
+              </div>
+            ) : (
+              <div className="text-center pb-2 border-b border-slate-850">
+                <span className="text-xs font-extrabold text-slate-400">
+                  {subTab === 'protein' && '🥤 編輯高蛋白紀錄'}
+                  {subTab === 'coffee' && '☕ 編輯咖啡紀錄'}
+                  {subTab === 'general' && '🍳 編輯一般飲食紀錄'}
+                </span>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Meal Type */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">餐別</label>
-                <select
-                  value={mealType}
-                  onChange={(e) => setMealType(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
-                >
-                  <option value="Breakfast">早餐 Breakfast</option>
-                  <option value="Lunch">午餐 Lunch</option>
-                  <option value="Dinner">晚餐 Dinner</option>
-                  <option value="Snack">點心/宵夜 Snack</option>
-                </select>
-              </div>
-
-              {/* Food Details */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">食物明細</label>
-                <textarea
-                  required
-                  rows={3}
-                  value={foodText}
-                  onChange={(e) => setFoodText(e.target.value)}
-                  placeholder="您今天吃了什麼？"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600 resize-none"
-                />
-              </div>
-
-              {/* Checkboxes Toggle */}
-              <div className="grid grid-cols-2 gap-4">
-                {/* High Protein */}
-                <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={isHighProtein}
-                    onChange={(e) => setIsHighProtein(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
-                  />
-                  <div className="flex items-center space-x-1 text-slate-300">
-                    <Award className="w-3.5 h-3.5 text-emerald-400" />
-                    <span className="text-xs font-semibold">補高蛋白</span>
+              
+              {/* SUB TAB 1: General Diet Form */}
+              {subTab === 'general' && (
+                <div className="space-y-4">
+                  {/* Meal Type */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">餐別</label>
+                    <select
+                      value={mealType}
+                      onChange={(e) => setMealType(e.target.value as any)}
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                    >
+                      <option value="Breakfast">早餐 Breakfast</option>
+                      <option value="Lunch">午餐 Lunch</option>
+                      <option value="Dinner">晚餐 Dinner</option>
+                      <option value="Snack">點心/宵夜 Snack</option>
+                    </select>
                   </div>
-                </label>
 
-                {/* Coffee */}
-                <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={hasCoffee}
-                    onChange={(e) => setHasCoffee(e.target.checked)}
-                    className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
-                  />
-                  <div className="flex items-center space-x-1 text-slate-300">
-                    <Coffee className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="text-xs font-semibold">喝了咖啡</span>
-                  </div>
-                </label>
-              </div>
-
-              {/* Photo upload */}
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">食物相片</label>
-                <div className="flex items-center space-x-4">
-                  <label className="flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-3 py-2 rounded-xl cursor-pointer transition text-xs font-semibold">
-                    <Camera className="w-3.5 h-3.5 text-purple-400" />
-                    <span>選擇照片</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePhotoChange}
-                      className="hidden"
+                  {/* Food Details */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">食物明細</label>
+                    <textarea
+                      required
+                      rows={3}
+                      value={foodText}
+                      onChange={(e) => setFoodText(e.target.value)}
+                      placeholder="您今天吃了什麼？"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600 resize-none"
                     />
-                  </label>
+                  </div>
 
-                  {/* Photo Preview / Existing Photo */}
-                  {(photoPreview || existingPhotoUrl) && (
-                    <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-800">
-                      <img 
-                        src={photoPreview || existingPhotoUrl!} 
-                        alt="Preview" 
-                        className="w-full h-full object-cover" 
+                  {/* Checkboxes Toggle */}
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* High Protein */}
+                    <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={isHighProtein}
+                        onChange={(e) => setIsHighProtein(e.target.checked)}
+                        className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
                       />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPhotoFile(null)
-                          setPhotoPreview(null)
-                          setExistingPhotoUrl(null)
-                        }}
-                        className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition cursor-pointer"
-                        title="清除相片"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
+                      <div className="flex items-center space-x-1 text-slate-300">
+                        <Award className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-xs font-semibold">補高蛋白</span>
+                      </div>
+                    </label>
+
+                    {/* Coffee */}
+                    <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        checked={hasCoffee}
+                        onChange={(e) => setHasCoffee(e.target.checked)}
+                        className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
+                      />
+                      <div className="flex items-center space-x-1 text-slate-300">
+                        <Coffee className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="text-xs font-semibold">喝了咖啡</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* SUB TAB 2: Protein Form */}
+              {subTab === 'protein' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Protein Content */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">蛋白質含量 (g)</label>
+                      <input
+                        type="number"
+                        required
+                        value={protein}
+                        onChange={(e) => setProtein(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+
+                    {/* Water Volume */}
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">沖泡水量 (ml)</label>
+                      <input
+                        type="number"
+                        required
+                        value={proteinVolume}
+                        onChange={(e) => setProteinVolume(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Flavor / Brand */}
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">口味 / 品牌 / 備註</label>
+                    <input
+                      type="text"
+                      value={proteinFlavor}
+                      onChange={(e) => setProteinFlavor(e.target.value)}
+                      placeholder="e.g. 戰神雙倍巧克力、Myprotein抹茶"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* SUB TAB 3: Coffee Form */}
+              {subTab === 'coffee' && (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Coffee bean/type */}
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">品項 / 豆種 / 備註</label>
+                      <input
+                        type="text"
+                        required
+                        value={coffeeBean}
+                        onChange={(e) => setCoffeeBean(e.target.value)}
+                        placeholder="e.g. 星巴克大冰美、手沖耶加雪菲日曬"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600"
+                      />
+                    </div>
+
+                    {/* Volume */}
+                    <div className="col-span-2 space-y-2">
+                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">飲用容量 (ml)</label>
+                      <input
+                        type="number"
+                        required
+                        value={coffeeVolume}
+                        onChange={(e) => setCoffeeVolume(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Common: Photo upload (Only relevant for general diet tab or existing edits) */}
+              {subTab === 'general' && (
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">食物相片</label>
+                  <div className="flex items-center space-x-4">
+                    <label className="flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-3 py-2 rounded-xl cursor-pointer transition text-xs font-semibold">
+                      <Camera className="w-3.5 h-3.5 text-purple-400" />
+                      <span>選擇照片</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePhotoChange}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {(photoPreview || existingPhotoUrl) && (
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden border border-slate-800">
+                        <img 
+                          src={photoPreview || existingPhotoUrl!} 
+                          alt="Preview" 
+                          className="w-full h-full object-cover" 
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPhotoFile(null)
+                            setPhotoPreview(null)
+                            setExistingPhotoUrl(null)
+                          }}
+                          className="absolute inset-0 bg-black/60 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition cursor-pointer"
+                          title="清除相片"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               <button
                 type="submit"
