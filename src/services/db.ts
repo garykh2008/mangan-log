@@ -88,6 +88,17 @@ export const medicationService = {
     return data
   },
 
+  async updateLog(id: string, log: Partial<Omit<MedicationLog, 'id' | 'created_at' | 'user_id'>>): Promise<MedicationLog> {
+    const { data, error } = await supabase
+      .from('medication_logs')
+      .update(log)
+      .match({ id })
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
   async deleteLog(id: string): Promise<void> {
     const { error } = await supabase
       .from('medication_logs')
@@ -112,6 +123,17 @@ export const biometricsService = {
     const { data, error } = await supabase
       .from('biometrics_logs')
       .insert([log])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  async updateLog(id: string, log: Partial<Omit<BiometricsLog, 'id' | 'created_at' | 'user_id'>>): Promise<BiometricsLog> {
+    const { data, error } = await supabase
+      .from('biometrics_logs')
+      .update(log)
+      .match({ id })
       .select()
       .single()
     if (error) throw error
@@ -148,6 +170,17 @@ export const dietService = {
     return data
   },
 
+  async updateLog(id: string, log: Partial<Omit<DietLog, 'id' | 'created_at' | 'user_id'>>): Promise<DietLog> {
+    const { data, error } = await supabase
+      .from('diet_logs')
+      .update(log)
+      .match({ id })
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
   async deleteLog(id: string): Promise<void> {
     const { error } = await supabase
       .from('diet_logs')
@@ -172,6 +205,17 @@ export const workoutService = {
     const { data, error } = await supabase
       .from('workout_logs')
       .insert([log])
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  },
+
+  async updateLog(id: string, log: Partial<Omit<WorkoutLog, 'id' | 'created_at' | 'user_id'>>): Promise<WorkoutLog> {
+    const { data, error } = await supabase
+      .from('workout_logs')
+      .update(log)
+      .match({ id })
       .select()
       .single()
     if (error) throw error
