@@ -22,9 +22,9 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: 'favicon.svg',
-            sizes: '192x192 512x512',
-            type: 'image/svg+xml',
+            src: 'pwa-icon.jpg',
+            sizes: '512x512',
+            type: 'image/jpeg',
             purpose: 'any maskable'
           }
         ]
