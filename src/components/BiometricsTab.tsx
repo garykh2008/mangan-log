@@ -10,18 +10,62 @@ interface BiometricsTabProps {
 
 // Custom Weight and Body Fat Chart Component using pure SVG
 const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
-  if (logs.length < 2) {
+  const [chartRange, setChartRange] = useState<'7logs' | '30days' | 'all'>('7logs')
+
+  // Get filtered logs based on chosen time range
+  const getFilteredLogs = () => {
+    if (chartRange === '7logs') {
+      return [...logs].slice(0, 7).reverse()
+    }
+    if (chartRange === '30days') {
+      const now = new Date()
+      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      return [...logs].filter(l => new Date(l.created_at) >= thirtyDaysAgo).reverse()
+    }
+    // 'all'
+    return [...logs].reverse()
+  }
+
+  const chartLogs = getFilteredLogs()
+
+  const ranges: { value: '7logs' | '30days' | 'all'; label: string }[] = [
+    { value: '7logs', label: '最近 7 次' },
+    { value: '30days', label: '最近 30 天' },
+    { value: 'all', label: '全部' }
+  ]
+
+  const renderRangeButtons = () => (
+    <div className="flex p-0.5 bg-slate-950/60 rounded-lg border border-slate-850/80 w-fit ml-auto">
+      {ranges.map(r => (
+        <button
+          key={r.value}
+          onClick={() => setChartRange(r.value)}
+          className={`px-2.5 py-1 text-[9px] font-black rounded-md transition cursor-pointer ${
+            chartRange === r.value ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-350'
+          }`}
+        >
+          {r.label}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (chartLogs.length < 2) {
     return (
-      <div className="flex flex-col items-center justify-center py-10 bg-slate-950/40 border border-slate-800/80 rounded-2xl text-center p-4">
-        <BarChart2 className="w-8 h-8 text-slate-600 mb-2" />
-        <span className="text-xs text-slate-500 font-medium">需要至少 2 筆紀錄來產生體重與體脂趨勢圖</span>
+      <div className="space-y-4">
+        {/* Render Toggle buttons even if there are not enough data in the specific range */}
+        <div className="flex justify-between items-center pb-2 border-b border-slate-850">
+          <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-1">身體指標趨勢</span>
+          {renderRangeButtons()}
+        </div>
+        <div className="flex flex-col items-center justify-center py-10 bg-slate-950/40 border border-slate-800/80 rounded-2xl text-center p-4">
+          <BarChart2 className="w-8 h-8 text-slate-600 mb-2" />
+          <span className="text-xs text-slate-500 font-medium">此時間區間內需要至少 2 筆紀錄來產生趨勢圖</span>
+        </div>
       </div>
     )
   }
 
-  // Get up to 7 logs, reverse to chronological order (oldest to newest)
-  const chartLogs = [...logs].slice(0, 7).reverse()
-  
   // Calculate Weight scales
   const weights = chartLogs.map(l => l.weight)
   const maxWeight = Math.max(...weights)
@@ -95,48 +139,56 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
     i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, ''
   )
 
-  // Smart calculations for header
-  const latestWeight = logs[0].weight
-  const oldestWeight = logs[logs.length - 1].weight
+  // Smart calculations for header relative to the current selected range
+  const latestWeight = chartLogs[chartLogs.length - 1].weight
+  const oldestWeight = chartLogs[0].weight
   const weightDiff = latestWeight - oldestWeight
 
-  const allFatLogs = logs.filter(l => l.body_fat !== null)
-  const latestFat = allFatLogs.length > 0 ? allFatLogs[0].body_fat : null
-  const oldestFat = allFatLogs.length > 0 ? allFatLogs[allFatLogs.length - 1].body_fat : null
+  const latestFat = fatLogs.length > 0 ? fatLogs[fatLogs.length - 1].body_fat : null
+  const oldestFat = fatLogs.length > 0 ? fatLogs[0].body_fat : null
   const fatDiff = (latestFat !== null && oldestFat !== null) ? latestFat - oldestFat : null
 
   const avgWeight = weights.reduce((a, b) => a + b, 0) / weights.length
   const avgFat = fats.length > 0 ? fats.reduce((a, b) => a + b, 0) / fats.length : null
 
+  // Adaptive label display: Hide numbers and dots when chart has > 10 data points
+  const showDetails = chartLogs.length <= 10
+
   return (
     <div className="space-y-4">
+      {/* Header View Options */}
+      <div className="flex justify-between items-center pb-2 border-b border-slate-850">
+        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-1">身體指標趨勢</span>
+        {renderRangeButtons()}
+      </div>
+
       {/* Header Info Grid */}
       <div className="grid grid-cols-2 gap-3.5">
         {/* Weight Insight */}
         <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">體重趨勢分析</span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">區間體重變化</span>
             <div className="flex items-baseline space-x-1">
               <span className="text-xl font-black text-white">{latestWeight}</span>
               <span className="text-xs text-slate-400 font-bold">kg</span>
             </div>
           </div>
-          <div className="mt-2.5 flex items-center space-x-1.5 text-xs font-bold">
+          <div className="mt-2.5 flex items-center space-x-1.5 text-[11px] font-bold">
             {weightDiff < 0 ? (
               <span className="text-emerald-400 flex items-center space-x-0.5">
                 <TrendingDown className="w-3.5 h-3.5 shrink-0" />
-                <span>累計減重 {Math.abs(weightDiff).toFixed(1)} kg</span>
+                <span>減重 {Math.abs(weightDiff).toFixed(1)} kg</span>
               </span>
             ) : weightDiff > 0 ? (
               <span className="text-amber-400 flex items-center space-x-0.5">
                 <TrendingUp className="w-3.5 h-3.5 shrink-0" />
-                <span>累計增加 {weightDiff.toFixed(1)} kg</span>
+                <span>增加 {weightDiff.toFixed(1)} kg</span>
               </span>
             ) : (
               <span className="text-slate-400">體重無起伏</span>
             )}
-            <span className="text-[10px] text-slate-500 font-bold">
-              (均: {avgWeight.toFixed(1)} kg)
+            <span className="text-[9px] text-slate-500 font-bold">
+              (均: {avgWeight.toFixed(1)})
             </span>
           </div>
         </div>
@@ -144,7 +196,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
         {/* Body Fat Insight */}
         <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">體脂率趨勢分析</span>
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">區間體脂變化</span>
             <div className="flex items-baseline space-x-1">
               <span className="text-xl font-black text-white">
                 {latestFat !== null ? `${latestFat}` : '--'}
@@ -152,7 +204,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
               <span className="text-xs text-slate-400 font-bold">%</span>
             </div>
           </div>
-          <div className="mt-2.5 flex items-center space-x-1.5 text-xs font-bold">
+          <div className="mt-2.5 flex items-center space-x-1.5 text-[11px] font-bold">
             {fatDiff !== null ? (
               fatDiff < 0 ? (
                 <span className="text-emerald-400 flex items-center space-x-0.5">
@@ -168,10 +220,10 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
                 <span className="text-slate-400">體脂無起伏</span>
               )
             ) : (
-              <span className="text-slate-500">暫無足夠體脂紀錄</span>
+              <span className="text-slate-500">暫無足夠紀錄</span>
             )}
             {avgFat !== null && (
-              <span className="text-[10px] text-slate-500 font-bold">
+              <span className="text-[9px] text-slate-500 font-bold">
                 (均: {avgFat.toFixed(1)}%)
               </span>
             )}
@@ -243,61 +295,73 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
             )}
 
             {/* Dots and Labels for Weight */}
-            {weightPoints.map((p, i) => (
-              <g key={`w-dot-${i}`}>
-                {/* Dot */}
-                <circle 
-                  cx={p.x} 
-                  cy={p.y} 
-                  r="4.5" 
-                  fill="#1e293b" 
-                  stroke="#3b82f6" 
-                  strokeWidth="2.5" 
-                />
-                {/* Value text above dot */}
-                <text 
-                  x={p.x} 
-                  y={p.y - 12} 
-                  textAnchor="middle" 
-                  className="fill-blue-400 text-[10px] font-black"
-                >
-                  {p.val}
-                </text>
-                {/* Date label at X axis */}
-                <text 
-                  x={p.x} 
-                  y={height - 12} 
-                  textAnchor="middle" 
-                  className="fill-slate-500 text-[9px] font-bold"
-                >
-                  {p.date}
-                </text>
-              </g>
-            ))}
+            {weightPoints.map((p, i) => {
+              const isFirstOrLast = i === 0 || i === weightPoints.length - 1
+              return (
+                <g key={`w-dot-${i}`}>
+                  {/* Draw circles & weight numbers only when showDetails is active */}
+                  {showDetails && (
+                    <>
+                      <circle 
+                        cx={p.x} 
+                        cy={p.y} 
+                        r="4.5" 
+                        fill="#1e293b" 
+                        stroke="#3b82f6" 
+                        strokeWidth="2.5" 
+                      />
+                      <text 
+                        x={p.x} 
+                        y={p.y - 12} 
+                        textAnchor="middle" 
+                        className="fill-blue-400 text-[10px] font-black"
+                      >
+                        {p.val}
+                      </text>
+                    </>
+                  )}
+                  {/* Date labels: Draw all when showDetails is true; draw only start & end when false */}
+                  {(showDetails || isFirstOrLast) && (
+                    <text 
+                      x={p.x} 
+                      y={height - 12} 
+                      textAnchor="middle" 
+                      className="fill-slate-500 text-[9px] font-bold"
+                    >
+                      {p.date}
+                    </text>
+                  )}
+                </g>
+              )
+            })}
 
             {/* Dots and Labels for Body Fat */}
-            {hasFatData && fatPoints.map((p, i) => (
-              <g key={`f-dot-${i}`}>
-                {/* Dot */}
-                <circle 
-                  cx={p.x} 
-                  cy={p.y} 
-                  r="4" 
-                  fill="#1e293b" 
-                  stroke="#d946ef" 
-                  strokeWidth="2" 
-                />
-                {/* Value text below dot */}
-                <text 
-                  x={p.x} 
-                  y={p.y + 16} 
-                  textAnchor="middle" 
-                  className="fill-purple-400 text-[9px] font-extrabold"
-                >
-                  {p.val}%
-                </text>
-              </g>
-            ))}
+            {hasFatData && fatPoints.map((p, i) => {
+              return (
+                <g key={`f-dot-${i}`}>
+                  {showDetails && (
+                    <>
+                      <circle 
+                        cx={p.x} 
+                        cy={p.y} 
+                        r="4" 
+                        fill="#1e293b" 
+                        stroke="#d946ef" 
+                        strokeWidth="2" 
+                      />
+                      <text 
+                        x={p.x} 
+                        y={p.y + 16} 
+                        textAnchor="middle" 
+                        className="fill-purple-400 text-[9px] font-extrabold"
+                      >
+                        {p.val}%
+                      </text>
+                    </>
+                  )}
+                </g>
+              )
+            })}
           </svg>
         </div>
       </div>
@@ -464,7 +528,6 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
       {/* Weight & Body Fat Trend Chart Card */}
       {!fetching && logs.length > 0 && (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4 animate-fadeIn">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">身體指標趨勢 (最近 7 次)</h3>
           <WeightFatChart logs={logs} />
         </div>
       )}
@@ -673,7 +736,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
           <button
             onClick={() => setActivePhoto(null)}
-            className="absolute top-4 right-4 p-2 bg-slate-900/60 hover:bg-slate-800 text-white rounded-full transition cursor-pointer"
+            className="absolute top-4 right-4 p-2 bg-slate-900/60 hover:bg-slate-850 text-white rounded-full transition cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
