@@ -167,11 +167,16 @@ export const MedicalTab: React.FC = () => {
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-wrap gap-1">
                       <span className="font-extrabold text-white text-sm">第 {log.cycle_number} 週</span>
                       {log.cycle_number === 3 && (
                         <span className="text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full font-bold border border-amber-500/20">
                           領藥提醒週
+                        </span>
+                      )}
+                      {log.is_pending && (
+                        <span className="text-[9px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full font-bold border border-amber-500/20 animate-pulse">
+                          🔄 待同步
                         </span>
                       )}
                     </div>

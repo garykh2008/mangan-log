@@ -601,11 +601,16 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                     <Weight className="w-5 h-5" />
                   </div>
                   <div className="space-y-0.5">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 flex-wrap gap-1">
                       <span className="font-extrabold text-white text-sm">{log.weight} kg</span>
                       {log.body_fat !== null && (
                         <span className="text-xs text-slate-300 font-semibold">
                           體脂: {log.body_fat}%
+                        </span>
+                      )}
+                      {log.is_pending && (
+                        <span className="text-[9px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full font-bold border border-amber-500/20 animate-pulse">
+                          🔄 待同步
                         </span>
                       )}
                     </div>
@@ -733,14 +738,23 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
 
               {/* Photo Upload */}
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">上傳進度照片</label>
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  上傳進度照片 {!navigator.onLine && <span className="text-amber-500 lowercase">(⚠️ 離線暫不支持上傳相片)</span>}
+                </label>
                 <div className="flex items-center space-x-4">
-                  <label className="flex items-center justify-center space-x-2 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 px-3 py-2 rounded-xl cursor-pointer transition text-xs font-semibold">
+                  <label 
+                    className={`flex items-center justify-center space-x-2 bg-slate-950 border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                      !navigator.onLine 
+                        ? 'opacity-40 cursor-not-allowed border-slate-900 bg-slate-950' 
+                        : 'hover:bg-slate-900 hover:border-slate-700 cursor-pointer'
+                    }`}
+                  >
                     <Camera className="w-3.5 h-3.5 text-purple-400" />
                     <span>選擇照片</span>
                     <input
                       type="file"
                       accept="image/*"
+                      disabled={!navigator.onLine}
                       onChange={handlePhotoChange}
                       className="hidden"
                     />

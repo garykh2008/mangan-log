@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AuthProvider, useAuth } from './contexts/AuthContext'
 import { Auth } from './components/Auth'
 import { Dashboard } from './components/Dashboard'
@@ -6,12 +6,18 @@ import { MedicalTab } from './components/MedicalTab'
 import { BiometricsTab } from './components/BiometricsTab'
 import { DietTab } from './components/DietTab'
 import { WorkoutTab } from './components/WorkoutTab'
-import { LogOut, Activity, User, LayoutDashboard, HeartPulse, Weight, Utensils, Dumbbell } from 'lucide-react'
+import { syncService } from './services/db'
+import { LogOut, Activity, User, LayoutDashboard, HeartPulse, Weight, Utensils, Dumbbell, AlertTriangle, RefreshCw } from 'lucide-react'
 
 function AppContent() {
   const { user, loading, signOut } = useAuth()
   const [activeTab, setActiveTab] = useState<string>('dashboard')
   const [openModalTab, setOpenModalTab] = useState<string | null>(null)
+
+  // Offline / Sync Status states
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [isSyncing, setIsSyncing] = useState(false)
+  const [pendingCount, setPendingCount] = useState(0)
 
   const handleTabChange = (tab: string, triggerModal = false) => {
     const mainTab = tab.split('-')[0]
@@ -26,6 +32,52 @@ function AppContent() {
   const handleModalOpened = () => {
     setOpenModalTab(null)
   }
+
+  // Monitor network status & sync pending data
+  useEffect(() => {
+    const updatePendingCount = () => {
+      setPendingCount(syncService.getPendingCount())
+    }
+
+    // Interval to check for pending count changes
+    const timer = setInterval(updatePendingCount, 2000)
+
+    const handleOnline = async () => {
+      setIsOnline(true)
+      const count = syncService.getPendingCount()
+      if (count > 0) {
+        try {
+          setIsSyncing(true)
+          await syncService.syncPendingLogs()
+          // Refresh page after sync is done to reload all components
+          window.location.reload()
+        } catch (err) {
+          console.error('Failed to sync offline logs:', err)
+        } finally {
+          setIsSyncing(false)
+        }
+      }
+    }
+
+    const handleOffline = () => {
+      setIsOnline(false)
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+
+    // Initial check on load
+    updatePendingCount()
+    if (navigator.onLine && syncService.getPendingCount() > 0) {
+      handleOnline()
+    }
+
+    return () => {
+      clearInterval(timer)
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
 
   if (loading) {
     return (
@@ -64,6 +116,25 @@ function AppContent() {
           </button>
         </div>
       </header>
+
+      {/* Offline / Sync Banner Bar */}
+      {!isOnline && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2.5 text-center text-xs text-amber-300 font-bold flex items-center justify-center space-x-1.5 animate-fadeIn">
+          <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 animate-bounce" />
+          <span>⚠️ 離線模式：您所記錄的數據將暫存於手機本地。</span>
+          {pendingCount > 0 && (
+            <span className="px-2 py-0.5 bg-amber-500/20 rounded-full text-[10px]">
+              {pendingCount} 筆待同步
+            </span>
+          )}
+        </div>
+      )}
+      {isOnline && isSyncing && (
+        <div className="bg-purple-600/10 border-b border-purple-500/20 px-4 py-2.5 text-center text-xs text-purple-300 font-bold flex items-center justify-center space-x-1.5">
+          <RefreshCw className="w-3.5 h-3.5 text-purple-400 animate-spin shrink-0" />
+          <span>🔄 網路已恢復，正在背景自動同步離線數據中...</span>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-md w-full mx-auto px-4 py-6">

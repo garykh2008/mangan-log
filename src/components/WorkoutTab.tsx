@@ -196,9 +196,16 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
                       <Dumbbell className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="font-extrabold text-white text-sm">
-                        {workoutOptions.find(opt => opt.value === log.workout_type)?.label || log.workout_type}
-                      </h4>
+                      <div className="flex items-center space-x-2 flex-wrap gap-1">
+                        <h4 className="font-extrabold text-white text-sm">
+                          {workoutOptions.find(opt => opt.value === log.workout_type)?.label || log.workout_type}
+                        </h4>
+                        {log.is_pending && (
+                          <span className="text-[9px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded-full font-bold border border-amber-500/20 animate-pulse">
+                            🔄 待同步
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center space-x-2 mt-0.5">
                         <Clock className="w-3.5 h-3.5 text-slate-500" />
                         <span className="text-xs text-slate-400 font-semibold">
