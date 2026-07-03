@@ -119,6 +119,10 @@ export async function uploadImage(
 export const medicationService = {
   async getLogs(): Promise<MedicationLog[]> {
     const pending = getPending(PENDING_KEYS.medication)
+    if (!navigator.onLine) {
+      const cached = getCache(CACHE_KEYS.medication)
+      return [...pending, ...cached]
+    }
     try {
       const { data, error } = await supabase
         .from('medication_logs')
@@ -232,6 +236,10 @@ export const medicationService = {
 export const biometricsService = {
   async getLogs(): Promise<BiometricsLog[]> {
     const pending = getPending(PENDING_KEYS.biometrics)
+    if (!navigator.onLine) {
+      const cached = getCache(CACHE_KEYS.biometrics)
+      return [...pending, ...cached]
+    }
     try {
       const { data, error } = await supabase
         .from('biometrics_logs')
@@ -343,6 +351,10 @@ export const biometricsService = {
 export const dietService = {
   async getLogs(): Promise<DietLog[]> {
     const pending = getPending(PENDING_KEYS.diet)
+    if (!navigator.onLine) {
+      const cached = getCache(CACHE_KEYS.diet)
+      return [...pending, ...cached]
+    }
     try {
       const { data, error } = await supabase
         .from('diet_logs')
@@ -458,6 +470,10 @@ export const dietService = {
 export const workoutService = {
   async getLogs(): Promise<WorkoutLog[]> {
     const pending = getPending(PENDING_KEYS.workout)
+    if (!navigator.onLine) {
+      const cached = getCache(CACHE_KEYS.workout)
+      return [...pending, ...cached]
+    }
     try {
       const { data, error } = await supabase
         .from('workout_logs')
