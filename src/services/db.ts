@@ -117,6 +117,12 @@ export async function uploadImage(
 
 // Medication API
 export const medicationService = {
+  getCachedLogs(): MedicationLog[] {
+    const pending = getPending(PENDING_KEYS.medication)
+    const cached = getCache(CACHE_KEYS.medication)
+    return [...pending, ...cached]
+  },
+
   async getLogs(): Promise<MedicationLog[]> {
     const pending = getPending(PENDING_KEYS.medication)
     if (!navigator.onLine) {
@@ -234,6 +240,12 @@ export const medicationService = {
 
 // Biometrics API
 export const biometricsService = {
+  getCachedLogs(): BiometricsLog[] {
+    const pending = getPending(PENDING_KEYS.biometrics)
+    const cached = getCache(CACHE_KEYS.biometrics)
+    return [...pending, ...cached]
+  },
+
   async getLogs(): Promise<BiometricsLog[]> {
     const pending = getPending(PENDING_KEYS.biometrics)
     if (!navigator.onLine) {
@@ -349,6 +361,12 @@ export const biometricsService = {
 
 // Diet API
 export const dietService = {
+  getCachedLogs(): DietLog[] {
+    const pending = getPending(PENDING_KEYS.diet)
+    const cached = getCache(CACHE_KEYS.diet)
+    return [...pending, ...cached]
+  },
+
   async getLogs(): Promise<DietLog[]> {
     const pending = getPending(PENDING_KEYS.diet)
     if (!navigator.onLine) {
@@ -468,6 +486,12 @@ export const dietService = {
 
 // Workout API
 export const workoutService = {
+  getCachedLogs(): WorkoutLog[] {
+    const pending = getPending(PENDING_KEYS.workout)
+    const cached = getCache(CACHE_KEYS.workout)
+    return [...pending, ...cached]
+  },
+
   async getLogs(): Promise<WorkoutLog[]> {
     const pending = getPending(PENDING_KEYS.workout)
     if (!navigator.onLine) {

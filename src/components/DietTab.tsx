@@ -51,13 +51,23 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
   const [error, setError] = useState<string | null>(null)
 
   const loadLogs = async () => {
-    try {
+    const cachedData = dietService.getCachedLogs()
+    if (cachedData.length > 0) {
+      setLogs(cachedData)
+      setFetching(false)
+    } else {
       setFetching(true)
+    }
+
+    try {
       const data = await dietService.getLogs()
       setLogs(data)
+      setError(null)
     } catch (err: any) {
       console.error(err)
-      setError('無法載入飲食記錄。')
+      if (cachedData.length === 0) {
+        setError('無法載入飲食記錄。')
+      }
     } finally {
       setFetching(false)
     }

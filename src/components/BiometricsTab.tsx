@@ -393,13 +393,23 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
   const [activePhoto, setActivePhoto] = useState<string | null>(null)
 
   const loadLogs = async () => {
-    try {
+    const cachedData = biometricsService.getCachedLogs()
+    if (cachedData.length > 0) {
+      setLogs(cachedData)
+      setFetching(false)
+    } else {
       setFetching(true)
+    }
+
+    try {
       const data = await biometricsService.getLogs()
       setLogs(data)
+      setError(null)
     } catch (err: any) {
       console.error(err)
-      setError('無法載入身體指標記錄。')
+      if (cachedData.length === 0) {
+        setError('無法載入身體指標記錄。')
+      }
     } finally {
       setFetching(false)
     }

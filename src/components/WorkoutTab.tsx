@@ -23,13 +23,23 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
   const [error, setError] = useState<string | null>(null)
 
   const loadLogs = async () => {
-    try {
+    const cachedData = workoutService.getCachedLogs()
+    if (cachedData.length > 0) {
+      setLogs(cachedData)
+      setFetching(false)
+    } else {
       setFetching(true)
+    }
+
+    try {
       const data = await workoutService.getLogs()
       setLogs(data)
+      setError(null)
     } catch (err: any) {
       console.error(err)
-      setError('無法載入運動記錄。')
+      if (cachedData.length === 0) {
+        setError('無法載入運動記錄。')
+      }
     } finally {
       setFetching(false)
     }
