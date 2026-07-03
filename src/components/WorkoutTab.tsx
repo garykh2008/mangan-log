@@ -157,7 +157,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center space-x-1.5 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-indigo-600/20"
+          className="flex items-center space-x-1.5 px-4 py-2.5 bg-brand-primary hover:brightness-110 active:brightness-95 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-brand-primary/20"
         >
           <Plus className="w-4 h-4" />
           <span>記錄運動</span>
@@ -171,12 +171,12 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
       )}
 
       {/* History Card List */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">歷次運動紀錄</h3>
 
         {fetching ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 text-purple-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-brand-primary animate-spin" />
           </div>
         ) : logs.length === 0 ? (
           <div className="text-center py-8 text-sm text-slate-500 font-medium">
@@ -187,7 +187,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
             {logs.map((log) => (
               <div
                 key={log.id}
-                className="p-4 bg-slate-950/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition flex flex-col space-y-3 relative"
+                className="p-4 bg-bg-app/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition flex flex-col space-y-3 relative"
               >
                 {/* Header row */}
                 <div className="flex items-center justify-between">
@@ -230,10 +230,10 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
                     <div className="flex items-center space-x-1">
                       <button
                         onClick={() => handleOpenEdit(log)}
-                        className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition cursor-pointer"
+                        className="p-1.5 hover:bg-bg-app text-slate-400 hover:text-white rounded-lg transition cursor-pointer"
                         title="編輯紀錄"
                       >
-                        <Edit2 className="w-3.5 h-3.5 text-indigo-400" />
+                        <Edit2 className="w-3.5 h-3.5 text-brand-secondary" />
                       </button>
                       <button
                         onClick={() => handleDelete(log.id)}
@@ -248,7 +248,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
 
                 {/* Notes row if exists */}
                 {log.notes && (
-                  <div className="p-3 bg-slate-900 border border-slate-850 rounded-xl flex items-start space-x-2 text-xs text-slate-300">
+                  <div className="p-3 bg-bg-app border border-slate-850 rounded-xl flex items-start space-x-2 text-xs text-slate-300">
                     <MessageSquare className="w-3.5 h-3.5 text-slate-500 shrink-0 mt-0.5" />
                     <p className="leading-relaxed whitespace-pre-line font-medium">
                       {log.notes}
@@ -268,16 +268,16 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
       {/* Shared Modal Form */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
+          <div className="max-w-md w-full bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             <button
               onClick={handleCloseForm}
-              className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 bg-bg-app hover:bg-bg-card text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center space-x-2 pb-2 border-b border-slate-800">
-              <Dumbbell className="w-5 h-5 text-indigo-400 animate-pulse" />
+              <Dumbbell className="w-5 h-5 text-brand-secondary animate-pulse" />
               <h2 className="text-base font-bold text-white">
                 {editingLog ? '修改運動紀錄' : '記錄健身運動'}
               </h2>
@@ -291,7 +291,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
                   <select
                     value={workoutType}
                     onChange={(e) => setWorkoutType(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
                   >
                     {workoutOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -310,7 +310,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
                     min="1"
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
@@ -353,14 +353,14 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="有什麼想紀錄的？"
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600 resize-none"
+                  className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary placeholder-slate-600 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
+                className="w-full bg-brand-primary hover:brightness-110 active:brightness-95 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
               >
                 {loading ? (
                   <>

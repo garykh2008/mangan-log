@@ -1,1 +1,37 @@
 @import "tailwindcss";
+
+@theme {
+  --color-brand-primary: var(--brand-primary);
+  --color-brand-secondary: var(--brand-secondary);
+  --color-brand-accent: var(--brand-accent);
+  --color-bg-app: var(--bg-app);
+  --color-bg-card: var(--bg-card);
+}
+
+:root {
+  /* Manganle Healthcare theme colors: Purple primary, Fuchsia secondary, Slate base */
+  --brand-primary: #a855f7;      /* purple-500 */
+  --brand-secondary: #c084fc;    /* purple-400 */
+  --brand-accent: #10b981;       /* emerald-500 */
+  --bg-app: #090d16;             /* deep slate blue-black */
+  --bg-card: #0f172a;            /* slate-900 card background */
+}
+
+/* Custom micro-animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.96); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scaleUp {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

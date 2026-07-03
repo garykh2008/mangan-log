@@ -63,7 +63,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 space-y-4">
-        <Activity className="w-8 h-8 text-purple-500 animate-pulse" />
+        <Activity className="w-8 h-8 text-brand-primary animate-pulse" />
         <span className="text-sm text-slate-400">正在整理今日數據...</span>
       </div>
     )
@@ -92,12 +92,12 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
   return (
     <div className="space-y-6">
       {/* Top Banner: Medication Progress */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative overflow-hidden shadow-xl">
-        <div className="absolute top-0 right-0 w-36 h-36 bg-purple-600/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 relative overflow-hidden shadow-xl">
+        <div className="absolute top-0 right-0 w-36 h-36 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
         
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400">藥物注射進度</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-secondary">藥物注射進度</span>
             <h2 className="text-2xl font-black text-white">
               {latestMed ? `第 ${latestMed.cycle_number} / 4 週` : '尚未開始週期'}
             </h2>
@@ -105,7 +105,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
               {latestMed ? `上次注射時間：${latestMed.injection_date} (${latestMed.dose} ml)` : '點擊底欄醫療紀錄施打'}
             </p>
           </div>
-          <div className="p-3 bg-purple-500/10 text-purple-400 rounded-2xl">
+          <div className="p-3 bg-brand-primary/10 text-brand-secondary rounded-2xl">
             <Calendar className="w-6 h-6" />
           </div>
         </div>
@@ -113,9 +113,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
         {/* Progress Bar */}
         {latestMed && (
           <div className="mt-5 space-y-2">
-            <div className="w-full bg-slate-950 rounded-full h-2.5 overflow-hidden border border-slate-800/80">
+            <div className="w-full bg-bg-app rounded-full h-2.5 overflow-hidden border border-slate-800/80">
               <div 
-                className="bg-gradient-to-r from-purple-500 to-indigo-500 h-2.5 rounded-full transition-all duration-500" 
+                className="bg-gradient-to-r from-brand-primary to-brand-secondary h-2.5 rounded-full transition-all duration-500" 
                 style={{ width: `${(latestMed.cycle_number / 4) * 100}%` }}
               />
             </div>
@@ -147,14 +147,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
       )}
 
       {/* Today's Checklist */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">今日健康查檢表</h3>
         
         <div className="space-y-3">
           {/* High Protein */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-950/40 rounded-2xl border border-slate-800/50">
+          <div className="flex items-center justify-between p-3.5 bg-bg-app/40 rounded-2xl border border-slate-800/50">
             <div className="flex items-center space-x-3">
-              <div className={`p-2 rounded-xl ${todayDiet.highProtein ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
+              <div className={`p-2 rounded-xl ${todayDiet.highProtein ? 'bg-emerald-500/10 text-emerald-400' : 'bg-bg-card text-slate-550 border border-slate-800'}`}>
                 <Award className="w-5 h-5" />
               </div>
               <span className="text-sm font-semibold text-slate-200">
@@ -166,7 +166,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
             ) : (
               <button 
                 onClick={() => onTabChange('diet-protein', true)}
-                className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
+                className="text-xs bg-bg-card hover:bg-bg-card/70 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
               >
                 去記錄
               </button>
@@ -174,9 +174,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
           </div>
 
           {/* Coffee */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-950/40 rounded-2xl border border-slate-800/50">
+          <div className="flex items-center justify-between p-3.5 bg-bg-app/40 rounded-2xl border border-slate-800/50">
             <div className="flex items-center space-x-3">
-              <div className={`p-2 rounded-xl ${todayDiet.coffee ? 'bg-amber-500/10 text-amber-400' : 'bg-slate-800 text-slate-500'}`}>
+              <div className={`p-2 rounded-xl ${todayDiet.coffee ? 'bg-amber-500/10 text-amber-400' : 'bg-bg-card text-slate-550 border border-slate-800'}`}>
                 <Coffee className="w-5 h-5" />
               </div>
               <span className="text-sm font-semibold text-slate-200">
@@ -188,7 +188,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
             ) : (
               <button 
                 onClick={() => onTabChange('diet-coffee', true)}
-                className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
+                className="text-xs bg-bg-card hover:bg-bg-card/70 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
               >
                 去記錄
               </button>
@@ -196,9 +196,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
           </div>
 
           {/* Workout */}
-          <div className="flex items-center justify-between p-3.5 bg-slate-950/40 rounded-2xl border border-slate-800/50">
+          <div className="flex items-center justify-between p-3.5 bg-bg-app/40 rounded-2xl border border-slate-800/50">
             <div className="flex items-center space-x-3">
-              <div className={`p-2 rounded-xl ${todayWorkout ? 'bg-indigo-500/10 text-indigo-400' : 'bg-slate-800 text-slate-500'}`}>
+              <div className={`p-2 rounded-xl ${todayWorkout ? 'bg-indigo-500/10 text-indigo-400' : 'bg-bg-card text-slate-550 border border-slate-800'}`}>
                 <Dumbbell className="w-5 h-5" />
               </div>
               <span className="text-sm font-semibold text-slate-200">
@@ -210,7 +210,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
             ) : (
               <button 
                 onClick={() => onTabChange('workout', true)}
-                className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
+                className="text-xs bg-bg-card hover:bg-bg-card/70 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
               >
                 去記錄
               </button>
@@ -220,11 +220,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
       </div>
 
       {/* Today's Summary Data List */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">今日健康紀錄快覽</h3>
 
         {/* 1. Today's Weight */}
-        <div className="p-4 bg-slate-950/40 border border-slate-800/50 rounded-2xl flex items-center justify-between">
+        <div className="p-4 bg-bg-app/40 border border-slate-800/50 rounded-2xl flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-500/10 text-blue-400 rounded-xl">
               <Weight className="w-5 h-5" />
@@ -244,7 +244,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
           {!todayWeightLog && (
             <button 
               onClick={() => onTabChange('biometrics', true)}
-              className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
+              className="text-xs bg-bg-card hover:bg-bg-card/70 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
             >
               量體重
             </button>
@@ -255,13 +255,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
         <div className="space-y-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase block pl-1">今日餐食清單</span>
           {todayMeals.length === 0 ? (
-            <div className="text-center py-4 bg-slate-950/20 border border-slate-850 rounded-2xl text-xs text-slate-600 font-medium">
+            <div className="text-center py-4 bg-bg-app/20 border border-slate-850 rounded-2xl text-xs text-slate-650 font-medium">
               今天還沒有吃東西的紀錄。
             </div>
           ) : (
             <div className="space-y-2 max-h-36 overflow-y-auto">
               {todayMeals.map(meal => (
-                <div key={meal.id} className="flex items-center justify-between p-2.5 bg-slate-950/30 border border-slate-850 rounded-xl text-xs">
+                <div key={meal.id} className="flex items-center justify-between p-2.5 bg-bg-app/30 border border-slate-850 rounded-xl text-xs">
                   <div className="flex items-center space-x-2 truncate">
                     <span className="text-slate-400 font-bold shrink-0">
                       {mealTypeTranslations[meal.meal_type as keyof typeof mealTypeTranslations]?.split(' ')[0] || '🍽️'}
@@ -283,13 +283,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
         <div className="space-y-2">
           <span className="text-[10px] font-bold text-slate-400 uppercase block pl-1">今日運動項目</span>
           {todayWorkouts.length === 0 ? (
-            <div className="text-center py-4 bg-slate-950/20 border border-slate-850 rounded-2xl text-xs text-slate-600 font-medium">
+            <div className="text-center py-4 bg-bg-app/20 border border-slate-850 rounded-2xl text-xs text-slate-650 font-medium">
               今天還沒有安排運動。
             </div>
           ) : (
             <div className="space-y-2">
               {todayWorkouts.map(workout => (
-                <div key={workout.id} className="flex items-center justify-between p-2.5 bg-slate-950/30 border border-slate-850 rounded-xl text-xs">
+                <div key={workout.id} className="flex items-center justify-between p-2.5 bg-bg-app/30 border border-slate-850 rounded-xl text-xs">
                   <div className="flex items-center space-x-2">
                     <Dumbbell className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
                     <span className="text-slate-200 font-semibold">

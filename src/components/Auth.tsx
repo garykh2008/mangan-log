@@ -52,15 +52,15 @@ export const Auth: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-slate-100 flex flex-col items-center justify-center p-4">
-      <div className="max-w-md w-full backdrop-blur-md bg-slate-900/80 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-8 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-bg-app via-bg-app to-bg-card text-slate-100 flex flex-col items-center justify-center p-4">
+      <div className="max-w-md w-full backdrop-blur-md bg-bg-card/85 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-8 relative overflow-hidden">
         {/* Decorative background glow */}
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 bg-brand-secondary/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* Brand Header */}
         <div className="flex flex-col items-center space-y-2 text-center">
-          <div className="p-3.5 bg-gradient-to-tr from-purple-500 to-indigo-500 text-white rounded-2xl shadow-lg shadow-purple-500/20">
+          <div className="p-3.5 bg-gradient-to-tr from-brand-primary to-brand-secondary text-white rounded-2xl shadow-lg shadow-brand-primary/20">
             <Activity className="w-8 h-8 animate-pulse" />
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
@@ -70,7 +70,7 @@ export const Auth: React.FC = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex p-1 bg-slate-950/80 rounded-xl border border-slate-800/80">
+        <div className="flex p-1 bg-bg-app/80 rounded-xl border border-slate-850">
           <button
             type="button"
             onClick={() => {
@@ -78,7 +78,7 @@ export const Auth: React.FC = () => {
               setMessage(null)
             }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition duration-200 cursor-pointer ${
-              !isSignUp ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+              !isSignUp ? 'bg-bg-card text-white shadow-sm border border-slate-800' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             登入帳號
@@ -90,7 +90,7 @@ export const Auth: React.FC = () => {
               setMessage(null)
             }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition duration-200 cursor-pointer ${
-              isSignUp ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+              isSignUp ? 'bg-bg-card text-white shadow-sm border border-slate-800' : 'text-slate-500 hover:text-slate-300'
             }`}
           >
             註冊新帳號
@@ -122,7 +122,7 @@ export const Auth: React.FC = () => {
               電子信箱 (Email)
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-550 pointer-events-none">
                 <Mail className="w-5 h-5" />
               </span>
               <input
@@ -131,7 +131,7 @@ export const Auth: React.FC = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full bg-slate-950/50 border border-slate-800 focus:border-purple-500 rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-purple-500 transition duration-200"
+                className="w-full bg-bg-app/50 border border-slate-800 focus:border-brand-primary rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-primary transition duration-200"
               />
             </div>
           </div>
@@ -141,7 +141,7 @@ export const Auth: React.FC = () => {
               密碼 (Password)
             </label>
             <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 pointer-events-none">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-550 pointer-events-none">
                 <Lock className="w-5 h-5" />
               </span>
               <input
@@ -150,7 +150,7 @@ export const Auth: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950/50 border border-slate-800 focus:border-purple-500 rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-purple-500 transition duration-200"
+                className="w-full bg-bg-app/50 border border-slate-800 focus:border-brand-primary rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-1 focus:ring-brand-primary transition duration-200"
               />
             </div>
           </div>
@@ -158,7 +158,7 @@ export const Auth: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 active:from-purple-700 active:to-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-500/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+            className="w-full bg-gradient-to-r from-brand-primary to-brand-secondary hover:brightness-110 active:brightness-90 text-white font-semibold py-3 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
           >
             {loading ? (
               <>

@@ -35,13 +35,13 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
   ]
 
   const renderRangeButtons = () => (
-    <div className="flex p-0.5 bg-slate-950/60 rounded-lg border border-slate-850/80 w-fit ml-auto">
+    <div className="flex p-0.5 bg-bg-app rounded-lg border border-slate-850 w-fit ml-auto">
       {ranges.map(r => (
         <button
           key={r.value}
           onClick={() => setChartRange(r.value)}
           className={`px-2.5 py-1 text-[9px] font-black rounded-md transition cursor-pointer ${
-            chartRange === r.value ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-355'
+            chartRange === r.value ? 'bg-bg-card text-brand-secondary shadow-sm' : 'text-slate-500 hover:text-slate-350'
           }`}
         >
           {r.label}
@@ -58,7 +58,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
           <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider pl-1">身體指標趨勢</span>
           {renderRangeButtons()}
         </div>
-        <div className="flex flex-col items-center justify-center py-10 bg-slate-950/40 border border-slate-800/80 rounded-2xl text-center p-4">
+        <div className="flex flex-col items-center justify-center py-10 bg-bg-app/40 border border-slate-800/80 rounded-2xl text-center p-4">
           <BarChart2 className="w-8 h-8 text-slate-600 mb-2" />
           <span className="text-xs text-slate-500 font-medium">此時間區間內需要至少 2 筆紀錄來產生趨勢圖</span>
         </div>
@@ -165,7 +165,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
       {/* Header Info Grid */}
       <div className="grid grid-cols-2 gap-3.5">
         {/* Weight Insight */}
-        <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
+        <div className="bg-bg-app/40 border border-slate-800/85 rounded-2xl p-4 flex flex-col justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">區間體重變化</span>
             <div className="flex items-baseline space-x-1">
@@ -187,14 +187,14 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
             ) : (
               <span className="text-slate-400">體重無起伏</span>
             )}
-            <span className="text-[9px] text-slate-500 font-bold">
+            <span className="text-[9px] text-slate-550 font-bold">
               (均: {avgWeight.toFixed(1)})
             </span>
           </div>
         </div>
 
         {/* Body Fat Insight */}
-        <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
+        <div className="bg-bg-app/40 border border-slate-800/85 rounded-2xl p-4 flex flex-col justify-between">
           <div className="space-y-1">
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">區間體脂變化</span>
             <div className="flex items-baseline space-x-1">
@@ -223,7 +223,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
               <span className="text-slate-500">暫無足夠紀錄</span>
             )}
             {avgFat !== null && (
-              <span className="text-[9px] text-slate-500 font-bold">
+              <span className="text-[9px] text-slate-550 font-bold">
                 (均: {avgFat.toFixed(1)}%)
               </span>
             )}
@@ -232,7 +232,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
       </div>
 
       {/* SVG Canvas Card */}
-      <div className="bg-slate-950/20 border border-slate-850 rounded-2xl p-4 relative overflow-hidden">
+      <div className="bg-bg-app/20 border border-slate-850 rounded-2xl p-4 relative overflow-hidden">
         {/* Legend labels */}
         <div className="flex justify-end items-center space-x-4 text-[9px] font-extrabold pb-2">
           <div className="flex items-center space-x-1.5">
@@ -557,7 +557,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center space-x-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-blue-600/20"
+          className="flex items-center space-x-1.5 px-4 py-2.5 bg-brand-primary hover:brightness-110 active:brightness-95 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-brand-primary/20"
         >
           <Plus className="w-4 h-4" />
           <span>新增數據</span>
@@ -572,18 +572,18 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
 
       {/* Weight & Body Fat Trend Chart Card */}
       {!fetching && logs.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4 animate-fadeIn">
+        <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4 animate-fadeIn">
           <WeightFatChart logs={logs} />
         </div>
       )}
 
       {/* History Table/List */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">身體數據歷史紀錄</h3>
 
         {fetching ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-brand-primary animate-spin" />
           </div>
         ) : logs.length === 0 ? (
           <div className="text-center py-8 text-sm text-slate-500 font-medium">
@@ -594,7 +594,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
             {logs.map((log) => (
               <div
                 key={log.id}
-                className="flex items-center justify-between p-4 bg-slate-950/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition"
+                className="flex items-center justify-between p-4 bg-bg-app/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition"
               >
                 <div className="flex items-center space-x-3.5">
                   <div className="p-2.5 bg-blue-500/10 text-blue-400 rounded-xl shrink-0">
@@ -614,7 +614,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-550">
                       紀錄日期：{new Date(log.created_at).toLocaleString()}
                     </p>
                   </div>
@@ -624,7 +624,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                   {log.photo_url && (
                     <button
                       onClick={() => handleOpenPhoto(log.photo_url!)}
-                      className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
+                      className="p-2 hover:bg-bg-app text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
                       title="查看照片"
                     >
                       <ImageIcon className="w-4 h-4 text-purple-400" />
@@ -632,10 +632,10 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                   )}
                   <button
                     onClick={() => handleOpenEdit(log)}
-                    className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
+                    className="p-2 hover:bg-bg-app text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
                     title="編輯記錄"
                   >
-                    <Edit2 className="w-4 h-4 text-blue-400" />
+                    <Edit2 className="w-4 h-4 text-brand-secondary" />
                   </button>
                   <button
                     onClick={() => handleDelete(log.id)}
@@ -653,13 +653,13 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
 
       {/* Progress Photo Gallery - MOVED TO BOTTOM AND COLLAPSED BY DEFAULT */}
       {!fetching && photoLogs.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+        <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
           <button 
             type="button"
             onClick={() => setIsAlbumExpanded(!isAlbumExpanded)}
             className="w-full flex items-center justify-between group cursor-pointer focus:outline-none"
           >
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 group-hover:text-slate-300 transition">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 group-hover:text-slate-350 transition">
               體態進度相簿 ({photoLogs.length})
             </h3>
             <div className="text-slate-500 group-hover:text-slate-300 transition">
@@ -679,7 +679,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white p-2 text-center">
                     <Eye className="w-5 h-5 mb-1 text-purple-400" />
                     <span className="text-[10px] font-bold">{new Date(log.created_at).toLocaleDateString()}</span>
-                    <span className="text-[10px] font-bold text-slate-300">{log.weight} kg</span>
+                    <span className="text-[10px] font-bold text-slate-305">{log.weight} kg</span>
                   </div>
                 </div>
               ))}
@@ -691,16 +691,16 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
       {/* Shared Modal Form */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
+          <div className="max-w-md w-full bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             <button
               onClick={handleCloseForm}
-              className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 bg-bg-app hover:bg-bg-card text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center space-x-2 pb-2 border-b border-slate-800">
-              <Weight className="w-5 h-5 text-blue-400 animate-pulse" />
+              <Weight className="w-5 h-5 text-brand-secondary animate-pulse" />
               <h2 className="text-base font-bold text-white">
                 {editingLog ? '修改身體數據' : '記錄身體數據'}
               </h2>
@@ -718,7 +718,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
                     placeholder="0.0"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
 
@@ -731,7 +731,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                     value={bodyFat}
                     onChange={(e) => setBodyFat(e.target.value)}
                     placeholder="選填"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
@@ -743,9 +743,9 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                 </label>
                 <div className="flex items-center space-x-4">
                   <label 
-                    className={`flex items-center justify-center space-x-2 bg-slate-950 border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                    className={`flex items-center justify-center space-x-2 bg-bg-app border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                       !navigator.onLine 
-                        ? 'opacity-40 cursor-not-allowed border-slate-900 bg-slate-950' 
+                        ? 'opacity-40 cursor-not-allowed border-slate-900 bg-bg-app' 
                         : 'hover:bg-slate-900 hover:border-slate-700 cursor-pointer'
                     }`}
                   >
@@ -788,7 +788,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
+                className="w-full bg-brand-primary hover:brightness-110 active:brightness-95 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
               >
                 {loading ? (
                   <>
@@ -809,7 +809,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
           <button
             onClick={handleClosePhoto}
-            className="absolute top-4 right-4 p-2 bg-slate-900/60 hover:bg-slate-800 text-white rounded-full transition cursor-pointer"
+            className="absolute top-4 right-4 p-2 bg-bg-card hover:bg-bg-card/80 text-white rounded-full transition cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>

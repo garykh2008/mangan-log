@@ -81,8 +81,8 @@ function AppContent() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center space-y-4">
-        <Activity className="w-10 h-10 text-purple-500 animate-pulse" />
+      <div className="min-h-screen bg-bg-app flex flex-col items-center justify-center space-y-4">
+        <Activity className="w-10 h-10 text-brand-primary animate-pulse" />
         <span className="text-sm text-slate-400 font-medium">載入中，請稍候...</span>
       </div>
     )
@@ -93,23 +93,23 @@ function AppContent() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col pb-24">
+    <div className="min-h-screen bg-bg-app text-slate-100 flex flex-col pb-24">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-900/60 px-4 py-3 flex items-center justify-between">
+      <header className="sticky top-0 z-50 backdrop-blur-md bg-bg-app/80 border-b border-slate-900/60 px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="p-2 bg-purple-500/10 text-purple-400 rounded-lg">
+          <div className="p-2 bg-brand-primary/10 text-brand-secondary rounded-lg">
             <Activity className="w-5 h-5 animate-pulse" />
           </div>
           <span className="font-black tracking-tight text-white text-lg">Manganle</span>
         </div>
         <div className="flex items-center space-x-3">
-          <div className="hidden sm:flex items-center space-x-1.5 text-xs text-slate-400 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-850">
-            <User className="w-3.5 h-3.5 text-purple-400" />
+          <div className="hidden sm:flex items-center space-x-1.5 text-xs text-slate-400 bg-bg-card px-3 py-1.5 rounded-lg border border-slate-850">
+            <User className="w-3.5 h-3.5 text-brand-secondary" />
             <span className="max-w-[150px] truncate font-semibold">{user.email}</span>
           </div>
           <button
             onClick={() => signOut()}
-            className="flex items-center space-x-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 text-xs font-bold text-rose-400 hover:text-rose-300 rounded-lg border border-slate-850 transition cursor-pointer"
+            className="flex items-center space-x-1.5 px-3 py-1.5 bg-bg-card hover:bg-bg-card/85 text-xs font-bold text-rose-400 hover:text-rose-300 rounded-lg border border-slate-850 transition cursor-pointer"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>登出</span>
@@ -130,8 +130,8 @@ function AppContent() {
         </div>
       )}
       {isOnline && isSyncing && (
-        <div className="bg-purple-600/10 border-b border-purple-500/20 px-4 py-2.5 text-center text-xs text-purple-300 font-bold flex items-center justify-center space-x-1.5">
-          <RefreshCw className="w-3.5 h-3.5 text-purple-400 animate-spin shrink-0" />
+        <div className="bg-brand-primary/10 border-b border-brand-primary/20 px-4 py-2.5 text-center text-xs text-brand-secondary font-bold flex items-center justify-center space-x-1.5">
+          <RefreshCw className="w-3.5 h-3.5 text-brand-secondary animate-spin shrink-0" />
           <span>🔄 網路已恢復，正在背景自動同步離線數據中...</span>
         </div>
       )}
@@ -161,13 +161,13 @@ function AppContent() {
       </main>
 
       {/* Responsive Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-slate-900/90 backdrop-blur-md border-t border-slate-800 py-2 shadow-2xl flex justify-around">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-bg-card/90 backdrop-blur-md border-t border-slate-800 py-2 shadow-2xl flex justify-around">
         <div className="max-w-md w-full flex justify-around px-2">
           {/* Dashboard Tab */}
           <button
             onClick={() => handleTabChange('dashboard')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
-              activeTab === 'dashboard' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
+              activeTab === 'dashboard' ? 'text-brand-secondary font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
           >
             <LayoutDashboard className="w-5.5 h-5.5 mb-1" />
@@ -178,7 +178,7 @@ function AppContent() {
           <button
             onClick={() => handleTabChange('medical')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
-              activeTab === 'medical' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
+              activeTab === 'medical' ? 'text-brand-secondary font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
           >
             <HeartPulse className="w-5.5 h-5.5 mb-1" />
@@ -189,7 +189,7 @@ function AppContent() {
           <button
             onClick={() => handleTabChange('biometrics')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
-              activeTab === 'biometrics' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
+              activeTab === 'biometrics' ? 'text-brand-secondary font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
           >
             <Weight className="w-5.5 h-5.5 mb-1" />
@@ -200,7 +200,7 @@ function AppContent() {
           <button
             onClick={() => handleTabChange('diet')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
-              activeTab === 'diet' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
+              activeTab === 'diet' ? 'text-brand-secondary font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
           >
             <Utensils className="w-5.5 h-5.5 mb-1" />
@@ -211,7 +211,7 @@ function AppContent() {
           <button
             onClick={() => handleTabChange('workout')}
             className={`flex flex-col items-center justify-center w-16 py-1 rounded-xl transition cursor-pointer ${
-              activeTab === 'workout' ? 'text-purple-400 font-bold' : 'text-slate-500 hover:text-slate-400'
+              activeTab === 'workout' ? 'text-brand-secondary font-bold' : 'text-slate-500 hover:text-slate-400'
             }`}
           >
             <Dumbbell className="w-5.5 h-5.5 mb-1" />

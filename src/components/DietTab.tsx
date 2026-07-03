@@ -286,7 +286,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
         <div className="space-y-1">
           <div className="flex items-center space-x-1.5 text-emerald-400 font-bold">
             <span>🥤 高蛋白補充</span>
-            <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-emerald-300">
+            <span className="text-xs px-2 py-0.5 bg-emerald-500/10 rounded-full border border-emerald-500/20 text-emerald-350">
               {pMatch || '25g'}
             </span>
           </div>
@@ -354,7 +354,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
         </div>
         <button
           onClick={() => handleOpenAdd('general')}
-          className="flex items-center space-x-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-emerald-600/20"
+          className="flex items-center space-x-1.5 px-4 py-2.5 bg-brand-primary hover:brightness-110 active:brightness-95 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-brand-primary/20"
         >
           <Plus className="w-4 h-4" />
           <span>記錄飲食</span>
@@ -368,12 +368,12 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
       )}
 
       {/* History Stream */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">今日與歷次飲食</h3>
 
         {fetching ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-brand-primary animate-spin" />
           </div>
         ) : logs.length === 0 ? (
           <div className="text-center py-8 text-sm text-slate-500 font-medium">
@@ -384,12 +384,12 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
             {logs.map((log) => (
               <div
                 key={log.id}
-                className="bg-slate-950/40 border border-slate-800/60 rounded-2xl p-4 space-y-3 hover:border-slate-850 transition relative overflow-hidden"
+                className="bg-bg-app/40 border border-slate-800/60 rounded-2xl p-4 space-y-3 hover:border-slate-850 transition relative overflow-hidden"
               >
                 {/* Header info */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2 flex-wrap gap-1">
-                    <span className="font-extrabold text-white text-xs bg-slate-900 border border-slate-800/80 px-2 py-0.5 rounded-lg">
+                    <span className="font-extrabold text-white text-xs bg-bg-card border border-slate-800/80 px-2 py-0.5 rounded-lg">
                       {mealTypeTranslations[log.meal_type as keyof typeof mealTypeTranslations] || log.meal_type}
                     </span>
                     {log.is_pending && (
@@ -404,10 +404,10 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                   <div className="flex items-center space-x-1">
                     <button
                       onClick={() => handleOpenEdit(log)}
-                      className="p-1.5 hover:bg-slate-800 text-slate-400 hover:text-white rounded-lg transition cursor-pointer"
+                      className="p-1.5 hover:bg-bg-app text-slate-400 hover:text-white rounded-lg transition cursor-pointer"
                       title="編輯紀錄"
                     >
-                      <Edit2 className="w-3.5 h-3.5 text-emerald-400" />
+                      <Edit2 className="w-3.5 h-3.5 text-brand-secondary" />
                     </button>
                     <button
                       onClick={() => handleDelete(log.id)}
@@ -439,12 +439,12 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
       {/* Shared Modal Form */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
+          <div className="max-w-md w-full bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             
             {/* Header row containing title and X close button to avoid overlap */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-850">
               <div className="flex items-center space-x-2">
-                <Utensils className="w-5 h-5 text-emerald-400" />
+                <Utensils className="w-5 h-5 text-brand-secondary" />
                 <h3 className="font-bold text-white text-base">
                   {editingLog ? '修改飲食紀錄' : '記錄今日飲食'}
                 </h3>
@@ -452,7 +452,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
               <button
                 type="button"
                 onClick={handleCloseForm}
-                className="p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
+                className="p-1.5 bg-bg-app hover:bg-bg-card text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -460,12 +460,12 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
 
             {/* Sub-tabs Selection inside Modal */}
             {!editingLog ? (
-              <div className="flex p-1 bg-slate-950/80 rounded-xl border border-slate-800/80 mt-1">
+              <div className="flex p-1 bg-bg-app/80 rounded-xl border border-slate-850 mt-1">
                 <button
                   type="button"
                   onClick={() => setSubTab('general')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
-                    subTab === 'general' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                    subTab === 'general' ? 'bg-bg-card text-brand-secondary shadow-sm border border-slate-800' : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
                   一般飲食
@@ -474,7 +474,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                   type="button"
                   onClick={() => setSubTab('protein')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
-                    subTab === 'protein' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                    subTab === 'protein' ? 'bg-bg-card text-brand-secondary shadow-sm border border-slate-800' : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
                   🥤 高蛋白
@@ -483,7 +483,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                   type="button"
                   onClick={() => setSubTab('coffee')}
                   className={`flex-1 py-1.5 text-xs font-semibold rounded-lg transition duration-200 cursor-pointer ${
-                    subTab === 'coffee' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-300'
+                    subTab === 'coffee' ? 'bg-bg-card text-brand-secondary shadow-sm border border-slate-800' : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
                   ☕ 咖啡
@@ -491,7 +491,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
               </div>
             ) : (
               <div className="text-center pb-1">
-                <span className="text-xs font-extrabold text-emerald-400">
+                <span className="text-xs font-extrabold text-brand-secondary">
                   {subTab === 'protein' && '🥤 正在編輯高蛋白紀錄'}
                   {subTab === 'coffee' && '☕ 正在編輯咖啡紀錄'}
                   {subTab === 'general' && '🍳 正在編輯一般飲食紀錄'}
@@ -510,7 +510,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                     <select
                       value={mealType}
                       onChange={(e) => setMealType(e.target.value as any)}
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                      className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
                     >
                       <option value="Breakfast">早餐 Breakfast</option>
                       <option value="Lunch">午餐 Lunch</option>
@@ -528,19 +528,19 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                       value={foodText}
                       onChange={(e) => setFoodText(e.target.value)}
                       placeholder="您今天吃了什麼？"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600 resize-none"
+                      className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary placeholder-slate-600 resize-none"
                     />
                   </div>
 
                   {/* Checkboxes Toggle */}
                   <div className="grid grid-cols-2 gap-4">
                     {/* High Protein */}
-                    <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
+                    <label className="flex items-center space-x-2.5 p-3 bg-bg-app/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={isHighProtein}
                         onChange={(e) => setIsHighProtein(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded text-brand-primary focus:ring-brand-primary border-slate-850 bg-bg-app cursor-pointer"
                       />
                       <div className="flex items-center space-x-1 text-slate-300">
                         <Award className="w-3.5 h-3.5 text-emerald-400" />
@@ -549,12 +549,12 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                     </label>
 
                     {/* Coffee */}
-                    <label className="flex items-center space-x-2.5 p-3 bg-slate-950/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
+                    <label className="flex items-center space-x-2.5 p-3 bg-bg-app/40 rounded-xl border border-slate-800/60 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={hasCoffee}
                         onChange={(e) => setHasCoffee(e.target.checked)}
-                        className="w-3.5 h-3.5 rounded text-purple-600 focus:ring-purple-500 border-slate-800 bg-slate-950 cursor-pointer"
+                        className="w-3.5 h-3.5 rounded text-brand-primary focus:ring-brand-primary border-slate-855 bg-bg-app cursor-pointer"
                       />
                       <div className="flex items-center space-x-1 text-slate-300">
                         <Coffee className="w-3.5 h-3.5 text-amber-400" />
@@ -570,9 +570,9 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                     </label>
                     <div className="flex items-center space-x-4">
                       <label 
-                        className={`flex items-center justify-center space-x-2 bg-slate-950 border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-semibold transition ${
+                        className={`flex items-center justify-center space-x-2 bg-bg-app border border-slate-800 text-slate-300 px-3 py-2 rounded-xl text-xs font-semibold transition ${
                           !navigator.onLine 
-                            ? 'opacity-40 cursor-not-allowed border-slate-900 bg-slate-950' 
+                            ? 'opacity-40 cursor-not-allowed border-slate-900 bg-bg-app' 
                             : 'hover:bg-slate-900 hover:border-slate-700 cursor-pointer'
                         }`}
                       >
@@ -625,7 +625,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                         required
                         value={protein}
                         onChange={(e) => setProtein(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                       />
                     </div>
 
@@ -637,7 +637,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                         required
                         value={proteinVolume}
                         onChange={(e) => setProteinVolume(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                       />
                     </div>
                   </div>
@@ -650,7 +650,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                       value={proteinFlavor}
                       onChange={(e) => setProteinFlavor(e.target.value)}
                       placeholder="e.g. 戰神雙倍巧克力、Myprotein抹茶"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600"
+                      className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary placeholder-slate-600"
                     />
                   </div>
                 </div>
@@ -669,7 +669,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                         value={coffeeBean}
                         onChange={(e) => setCoffeeBean(e.target.value)}
                         placeholder="e.g. 星巴克大冰美、手沖耶加雪菲日曬"
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 placeholder-slate-600"
+                        className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary placeholder-slate-600"
                       />
                     </div>
 
@@ -681,7 +681,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                         required
                         value={coffeeVolume}
                         onChange={(e) => setCoffeeVolume(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                        className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                       />
                     </div>
                   </div>
@@ -691,7 +691,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
               {/* Generic Custom Record Time (Editable for all sub-tabs) */}
               <div className="space-y-2 pt-2 border-t border-slate-850">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center space-x-1">
-                  <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                  <Calendar className="w-3.5 h-3.5 text-brand-secondary" />
                   <span>記錄時間 (可修改歷史時間)</span>
                 </label>
                 <input
@@ -699,14 +699,14 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
                   required
                   value={createdAt}
                   onChange={(e) => setCreatedAt(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                  className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
+                className="w-full bg-brand-primary hover:brightness-110 active:brightness-95 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
               >
                 {loading ? (
                   <>

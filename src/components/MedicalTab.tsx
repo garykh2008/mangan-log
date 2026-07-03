@@ -123,14 +123,14 @@ export const MedicalTab: React.FC = () => {
       {/* Top Header Row */}
       <div className="flex items-center justify-between pb-4 border-b border-slate-900">
         <div className="flex items-center space-x-2.5">
-          <div className="p-2 bg-purple-500/10 text-purple-400 rounded-xl">
+          <div className="p-2 bg-brand-primary/10 text-brand-secondary rounded-xl">
             <Activity className="w-5 h-5 animate-pulse" />
           </div>
           <h2 className="text-xl font-black text-white">針劑施打管理</h2>
         </div>
         <button
           onClick={handleOpenAdd}
-          className="flex items-center space-x-1.5 px-4 py-2.5 bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-purple-600/20"
+          className="flex items-center space-x-1.5 px-4 py-2.5 bg-brand-primary hover:brightness-110 active:brightness-95 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-brand-primary/20"
         >
           <Plus className="w-4 h-4" />
           <span>新增紀錄</span>
@@ -144,12 +144,12 @@ export const MedicalTab: React.FC = () => {
       )}
 
       {/* History List Card */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+      <div className="bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">歷次施打紀錄</h3>
 
         {fetching ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="w-6 h-6 text-purple-500 animate-spin" />
+            <Loader2 className="w-6 h-6 text-brand-primary animate-spin" />
           </div>
         ) : logs.length === 0 ? (
           <div className="text-center py-8 text-sm text-slate-500 font-medium">
@@ -160,10 +160,10 @@ export const MedicalTab: React.FC = () => {
             {logs.map((log) => (
               <div
                 key={log.id}
-                className="flex items-center justify-between p-4 bg-slate-950/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition"
+                className="flex items-center justify-between p-4 bg-bg-app/40 border border-slate-800/60 rounded-2xl hover:border-slate-850 transition"
               >
                 <div className="flex items-center space-x-3.5">
-                  <div className="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl shrink-0">
+                  <div className="p-2.5 bg-brand-primary/10 text-brand-secondary rounded-xl shrink-0">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="space-y-0.5">
@@ -189,10 +189,10 @@ export const MedicalTab: React.FC = () => {
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={() => handleOpenEdit(log)}
-                    className="p-2 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-xl transition cursor-pointer"
+                    className="p-2 hover:bg-bg-app text-slate-400 hover:text-slate-200 rounded-xl transition cursor-pointer"
                     title="編輯記錄"
                   >
-                    <Edit2 className="w-4 h-4 text-purple-400" />
+                    <Edit2 className="w-4 h-4 text-brand-secondary" />
                   </button>
                   <button
                     onClick={() => handleDelete(log.id)}
@@ -211,16 +211,16 @@ export const MedicalTab: React.FC = () => {
       {/* Shared Modal Form */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
-          <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
+          <div className="max-w-md w-full bg-bg-card border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             <button
               onClick={handleCloseForm}
-              className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
+              className="absolute top-4 right-4 p-1.5 bg-bg-app hover:bg-bg-card text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
 
             <div className="flex items-center space-x-2 pb-2 border-b border-slate-800">
-              <Activity className="w-5 h-5 text-purple-400 animate-pulse" />
+              <Activity className="w-5 h-5 text-brand-secondary animate-pulse" />
               <h2 className="text-base font-bold text-white">
                 {editingLog ? '修改施打紀錄' : '記錄針劑施打'}
               </h2>
@@ -236,7 +236,7 @@ export const MedicalTab: React.FC = () => {
                     required
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
 
@@ -251,7 +251,7 @@ export const MedicalTab: React.FC = () => {
                     value={dose}
                     onChange={(e) => setDose(e.target.value)}
                     placeholder="0.25"
-                    className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export const MedicalTab: React.FC = () => {
                 <select
                   value={cycle}
                   onChange={(e) => setCycle(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 focus:border-purple-500 rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-purple-500 cursor-pointer"
+                  className="w-full bg-bg-app border border-slate-800 focus:border-brand-primary rounded-xl py-2 px-2.5 text-xs text-slate-200 focus:outline-none focus:ring-1 focus:ring-brand-primary cursor-pointer"
                 >
                   <option value="1">第 1 週 (Cycle 1)</option>
                   <option value="2">第 2 週 (Cycle 2)</option>
@@ -274,7 +274,7 @@ export const MedicalTab: React.FC = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-500 active:bg-purple-700 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-purple-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
+                className="w-full bg-brand-primary hover:brightness-110 active:brightness-95 text-white font-semibold py-2.5 px-4 rounded-xl transition duration-200 cursor-pointer shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 text-xs"
               >
                 {loading ? (
                   <>
