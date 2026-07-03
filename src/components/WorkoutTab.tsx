@@ -39,6 +39,19 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
     loadLogs()
   }, [])
 
+  // Listen to popstate event to dismiss modal when mobile back button is swiped
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isOpen) {
+        setIsOpen(false)
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isOpen])
+
   useEffect(() => {
     if (autoOpen) {
       handleOpenAdd()
@@ -53,6 +66,9 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
     setIntensity(3)
     setNotes('')
     setError(null)
+    
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'workout-form' }, '')
     setIsOpen(true)
   }
 
@@ -63,7 +79,17 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
     setIntensity(log.intensity)
     setNotes(log.notes || '')
     setError(null)
+    
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'workout-form' }, '')
     setIsOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsOpen(false)
+    if (window.history.state?.modal === 'workout-form') {
+      window.history.back()
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -90,7 +116,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
         })
       }
 
-      setIsOpen(false)
+      handleCloseForm()
       await loadLogs()
     } catch (err: any) {
       console.error(err)
@@ -237,7 +263,7 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ autoOpen, onModalOpened 
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={handleCloseForm}
               className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />

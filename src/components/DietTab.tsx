@@ -67,6 +67,19 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
     loadLogs()
   }, [])
 
+  // Listen to popstate event to dismiss modal when mobile back button is swiped
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isOpen) {
+        setIsOpen(false)
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isOpen])
+
   useEffect(() => {
     if (autoOpen) {
       let targetSubTab: 'general' | 'protein' | 'coffee' = 'general'
@@ -106,6 +119,9 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
     setPhotoPreview(null)
     setExistingPhotoUrl(null)
     setError(null)
+    
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'diet-form' }, '')
     setIsOpen(true)
   }
 
@@ -150,7 +166,16 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
       setHasCoffee(log.has_coffee)
     }
 
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'diet-form' }, '')
     setIsOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsOpen(false)
+    if (window.history.state?.modal === 'diet-form') {
+      window.history.back()
+    }
   }
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,7 +245,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
         })
       }
 
-      setIsOpen(false)
+      handleCloseForm()
       await loadLogs()
     } catch (err: any) {
       console.error(err)
@@ -421,7 +446,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
               </div>
               <button
                 type="button"
-                onClick={() => setIsOpen(false)}
+                onClick={handleCloseForm}
                 className="p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
               >
                 <X className="w-4 h-4" />

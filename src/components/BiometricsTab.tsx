@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { biometricsService, uploadImage, type BiometricsLog } from '../services/db'
 import { useAuth } from '../contexts/AuthContext'
-import { Weight, Camera, Trash2, Edit2, Plus, Loader2, Image as ImageIcon, Eye, X, TrendingDown, TrendingUp, BarChart2 } from 'lucide-react'
+import { Weight, Camera, Trash2, Edit2, Plus, Loader2, Image as ImageIcon, Eye, X, TrendingDown, TrendingUp, BarChart2, ChevronDown, ChevronUp } from 'lucide-react'
 
 interface BiometricsTabProps {
   autoOpen?: boolean
@@ -41,7 +41,7 @@ const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
           key={r.value}
           onClick={() => setChartRange(r.value)}
           className={`px-2.5 py-1 text-[9px] font-black rounded-md transition cursor-pointer ${
-            chartRange === r.value ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-350'
+            chartRange === r.value ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-355'
           }`}
         >
           {r.label}
@@ -374,6 +374,9 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
   const [logs, setLogs] = useState<BiometricsLog[]>([])
   const [isOpen, setIsOpen] = useState(false)
   const [editingLog, setEditingLog] = useState<BiometricsLog | null>(null)
+  
+  // Gallery Collapsed State
+  const [isAlbumExpanded, setIsAlbumExpanded] = useState(false)
 
   // Form states
   const [weight, setWeight] = useState('')
@@ -406,6 +409,22 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
     loadLogs()
   }, [])
 
+  // Listen to popstate event to dismiss modal/lightbox when mobile back button is swiped
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isOpen) {
+        setIsOpen(false)
+      }
+      if (activePhoto) {
+        setActivePhoto(null)
+      }
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isOpen, activePhoto])
+
   useEffect(() => {
     if (autoOpen) {
       handleOpenAdd()
@@ -421,6 +440,9 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
     setPhotoPreview(null)
     setExistingPhotoUrl(null)
     setError(null)
+    
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'biometrics-form' }, '')
     setIsOpen(true)
   }
 
@@ -432,7 +454,29 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
     setPhotoPreview(null)
     setExistingPhotoUrl(log.photo_url)
     setError(null)
+    
+    // Push virtual history state for back navigation
+    window.history.pushState({ modal: 'biometrics-form' }, '')
     setIsOpen(true)
+  }
+
+  const handleCloseForm = () => {
+    setIsOpen(false)
+    if (window.history.state?.modal === 'biometrics-form') {
+      window.history.back()
+    }
+  }
+
+  const handleOpenPhoto = (url: string) => {
+    window.history.pushState({ modal: 'photo-lightbox' }, '')
+    setActivePhoto(url)
+  }
+
+  const handleClosePhoto = () => {
+    setActivePhoto(null)
+    if (window.history.state?.modal === 'photo-lightbox') {
+      window.history.back()
+    }
   }
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -477,7 +521,8 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         })
       }
 
-      setIsOpen(false)
+      // Close Form and pop history state
+      handleCloseForm()
       await loadLogs()
     } catch (err: any) {
       console.error(err)
@@ -532,29 +577,6 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         </div>
       )}
 
-      {/* Progress Photo Gallery */}
-      {photoLogs.length > 0 && (
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">體態進度相簿</h3>
-          <div className="grid grid-cols-3 gap-3">
-            {photoLogs.map((log) => (
-              <div 
-                key={log.id} 
-                className="relative aspect-square rounded-2xl overflow-hidden border border-slate-800 group cursor-pointer shadow"
-                onClick={() => setActivePhoto(log.photo_url)}
-              >
-                <img src={log.photo_url!} alt="Progress" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white p-2 text-center">
-                  <Eye className="w-5 h-5 mb-1 text-purple-400" />
-                  <span className="text-[10px] font-bold">{new Date(log.created_at).toLocaleDateString()}</span>
-                  <span className="text-[10px] font-bold text-slate-300">{log.weight} kg</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* History Table/List */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
         <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">身體數據歷史紀錄</h3>
@@ -596,7 +618,7 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
                 <div className="flex items-center space-x-1">
                   {log.photo_url && (
                     <button
-                      onClick={() => setActivePhoto(log.photo_url)}
+                      onClick={() => handleOpenPhoto(log.photo_url!)}
                       className="p-2 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl transition cursor-pointer"
                       title="查看照片"
                     >
@@ -624,12 +646,49 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
         )}
       </div>
 
+      {/* Progress Photo Gallery - MOVED TO BOTTOM AND COLLAPSED BY DEFAULT */}
+      {!fetching && photoLogs.length > 0 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
+          <button 
+            type="button"
+            onClick={() => setIsAlbumExpanded(!isAlbumExpanded)}
+            className="w-full flex items-center justify-between group cursor-pointer focus:outline-none"
+          >
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1 group-hover:text-slate-300 transition">
+              體態進度相簿 ({photoLogs.length})
+            </h3>
+            <div className="text-slate-500 group-hover:text-slate-300 transition">
+              {isAlbumExpanded ? <ChevronUp className="w-4.5 h-4.5" /> : <ChevronDown className="w-4.5 h-4.5" />}
+            </div>
+          </button>
+          
+          {isAlbumExpanded && (
+            <div className="grid grid-cols-3 gap-3 pt-2 animate-fadeIn">
+              {photoLogs.map((log) => (
+                <div 
+                  key={log.id} 
+                  className="relative aspect-square rounded-2xl overflow-hidden border border-slate-800 group cursor-pointer shadow"
+                  onClick={() => handleOpenPhoto(log.photo_url!)}
+                >
+                  <img src={log.photo_url!} alt="Progress" className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center text-white p-2 text-center">
+                    <Eye className="w-5 h-5 mb-1 text-purple-400" />
+                    <span className="text-[10px] font-bold">{new Date(log.created_at).toLocaleDateString()}</span>
+                    <span className="text-[10px] font-bold text-slate-300">{log.weight} kg</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Shared Modal Form */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div className="max-w-md w-full bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-4 relative animate-scaleUp">
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={handleCloseForm}
               className="absolute top-4 right-4 p-1.5 bg-slate-950 hover:bg-slate-850 text-slate-400 hover:text-white rounded-full border border-slate-800 transition cursor-pointer"
             >
               <X className="w-4 h-4" />
@@ -735,8 +794,8 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
       {activePhoto && (
         <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4">
           <button
-            onClick={() => setActivePhoto(null)}
-            className="absolute top-4 right-4 p-2 bg-slate-900/60 hover:bg-slate-850 text-white rounded-full transition cursor-pointer"
+            onClick={handleClosePhoto}
+            className="absolute top-4 right-4 p-2 bg-slate-900/60 hover:bg-slate-800 text-white rounded-full transition cursor-pointer"
           >
             <X className="w-6 h-6" />
           </button>
