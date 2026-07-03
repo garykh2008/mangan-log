@@ -14,7 +14,8 @@ function AppContent() {
   const [openModalTab, setOpenModalTab] = useState<string | null>(null)
 
   const handleTabChange = (tab: string, triggerModal = false) => {
-    setActiveTab(tab)
+    const mainTab = tab.split('-')[0]
+    setActiveTab(mainTab)
     if (triggerModal) {
       setOpenModalTab(tab)
     } else {
@@ -76,7 +77,7 @@ function AppContent() {
         )}
         {activeTab === 'diet' && (
           <DietTab 
-            autoOpen={openModalTab === 'diet'} 
+            autoOpen={openModalTab} 
             onModalOpened={handleModalOpened} 
           />
         )}

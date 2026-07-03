@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import { Utensils, Camera, Trash2, Edit2, Plus, Loader2, Award, Coffee, X, Calendar } from 'lucide-react'
 
 interface DietTabProps {
-  autoOpen?: boolean
+  autoOpen?: string | null | boolean
   onModalOpened?: () => void
 }
 
@@ -69,14 +69,22 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
 
   useEffect(() => {
     if (autoOpen) {
-      handleOpenAdd()
+      let targetSubTab: 'general' | 'protein' | 'coffee' = 'general'
+      if (typeof autoOpen === 'string') {
+        if (autoOpen.endsWith('protein')) {
+          targetSubTab = 'protein'
+        } else if (autoOpen.endsWith('coffee')) {
+          targetSubTab = 'coffee'
+        }
+      }
+      handleOpenAdd(targetSubTab)
       onModalOpened?.()
     }
   }, [autoOpen])
 
-  const handleOpenAdd = () => {
+  const handleOpenAdd = (defaultSubTab: 'general' | 'protein' | 'coffee' = 'general') => {
     setEditingLog(null)
-    setSubTab('general')
+    setSubTab(defaultSubTab)
     setMealType('Breakfast')
     setFoodText('')
     setIsHighProtein(false)
@@ -320,7 +328,7 @@ export const DietTab: React.FC<DietTabProps> = ({ autoOpen, onModalOpened }) => 
           <h2 className="text-xl font-black text-white">飲食記錄管理</h2>
         </div>
         <button
-          onClick={handleOpenAdd}
+          onClick={() => handleOpenAdd('general')}
           className="flex items-center space-x-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white text-xs font-bold rounded-xl transition cursor-pointer shadow-lg shadow-emerald-600/20"
         >
           <Plus className="w-4 h-4" />

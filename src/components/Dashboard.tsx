@@ -165,7 +165,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
               <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
             ) : (
               <button 
-                onClick={() => onTabChange('diet', true)}
+                onClick={() => onTabChange('diet-protein', true)}
                 className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
               >
                 去記錄
@@ -187,7 +187,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onTabChange }) => {
               <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
             ) : (
               <button 
-                onClick={() => onTabChange('diet', true)}
+                onClick={() => onTabChange('diet-coffee', true)}
                 className="text-xs bg-slate-850 hover:bg-slate-800 text-slate-300 py-1.5 px-3 rounded-lg font-bold transition cursor-pointer border border-slate-800 shrink-0"
               >
                 去記錄
