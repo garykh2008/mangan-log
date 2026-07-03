@@ -1,11 +1,308 @@
 import React, { useEffect, useState } from 'react'
 import { biometricsService, uploadImage, type BiometricsLog } from '../services/db'
 import { useAuth } from '../contexts/AuthContext'
-import { Weight, Camera, Trash2, Edit2, Plus, Loader2, Image as ImageIcon, Eye, X } from 'lucide-react'
+import { Weight, Camera, Trash2, Edit2, Plus, Loader2, Image as ImageIcon, Eye, X, TrendingDown, TrendingUp, BarChart2 } from 'lucide-react'
 
 interface BiometricsTabProps {
   autoOpen?: boolean
   onModalOpened?: () => void
+}
+
+// Custom Weight and Body Fat Chart Component using pure SVG
+const WeightFatChart: React.FC<{ logs: BiometricsLog[] }> = ({ logs }) => {
+  if (logs.length < 2) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 bg-slate-950/40 border border-slate-800/80 rounded-2xl text-center p-4">
+        <BarChart2 className="w-8 h-8 text-slate-600 mb-2" />
+        <span className="text-xs text-slate-500 font-medium">需要至少 2 筆紀錄來產生體重與體脂趨勢圖</span>
+      </div>
+    )
+  }
+
+  // Get up to 7 logs, reverse to chronological order (oldest to newest)
+  const chartLogs = [...logs].slice(0, 7).reverse()
+  
+  // Calculate Weight scales
+  const weights = chartLogs.map(l => l.weight)
+  const maxWeight = Math.max(...weights)
+  const minWeight = Math.min(...weights)
+  const wRange = maxWeight === minWeight ? 2 : maxWeight - minWeight
+  const wMin = minWeight - wRange * 0.15
+  const wMax = maxWeight + wRange * 0.15
+
+  // Calculate Body Fat scales (only from logs that have body fat values)
+  const fatLogs = chartLogs.filter(l => l.body_fat !== null)
+  const fats = fatLogs.map(l => l.body_fat as number)
+  const hasFatData = fats.length >= 2
+  
+  let fMin = 0
+  let fMax = 100
+  if (hasFatData) {
+    const maxFat = Math.max(...fats)
+    const minFat = Math.min(...fats)
+    const fRange = maxFat === minFat ? 2 : maxFat - minFat
+    fMin = minFat - fRange * 0.15
+    fMax = maxFat + fRange * 0.15
+  }
+
+  // SVG parameters
+  const width = 500
+  const height = 220
+  const paddingX = 45
+  const paddingY = 35
+
+  // Helper to map weight value to SVG coordinate
+  const getWeightY = (w: number) => {
+    return height - paddingY - ((w - wMin) / (wMax - wMin)) * (height - 2 * paddingY)
+  }
+
+  // Helper to map body fat value to SVG coordinate
+  const getFatY = (f: number) => {
+    return height - paddingY - ((f - fMin) / (fMax - fMin)) * (height - 2 * paddingY)
+  }
+
+  const getX = (index: number) => {
+    if (chartLogs.length === 1) return width / 2
+    return paddingX + (index * (width - 2 * paddingX)) / (chartLogs.length - 1)
+  }
+
+  // Generate Weight path points
+  const weightPoints = chartLogs.map((log, i) => ({
+    x: getX(i),
+    y: getWeightY(log.weight),
+    val: log.weight,
+    date: new Date(log.created_at).toLocaleDateString([], { month: 'numeric', day: 'numeric' })
+  }))
+
+  const weightLineD = weightPoints.reduce((acc, p, i) => 
+    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, ''
+  )
+
+  const weightAreaD = weightPoints.length > 0 
+    ? `${weightLineD} L ${weightPoints[weightPoints.length - 1].x} ${height - paddingY} L ${weightPoints[0].x} ${height - paddingY} Z`
+    : ''
+
+  // Generate Body Fat path points (only for entries with body fat)
+  const fatPoints = chartLogs
+    .map((log, i) => ({
+      x: getX(i),
+      y: log.body_fat !== null ? getFatY(log.body_fat) : null,
+      val: log.body_fat,
+    }))
+    .filter(p => p.y !== null) as { x: number; y: number; val: number }[]
+
+  const fatLineD = fatPoints.reduce((acc, p, i) => 
+    i === 0 ? `M ${p.x} ${p.y}` : `${acc} L ${p.x} ${p.y}`, ''
+  )
+
+  // Smart calculations for header
+  const latestWeight = logs[0].weight
+  const oldestWeight = logs[logs.length - 1].weight
+  const weightDiff = latestWeight - oldestWeight
+
+  const allFatLogs = logs.filter(l => l.body_fat !== null)
+  const latestFat = allFatLogs.length > 0 ? allFatLogs[0].body_fat : null
+  const oldestFat = allFatLogs.length > 0 ? allFatLogs[allFatLogs.length - 1].body_fat : null
+  const fatDiff = (latestFat !== null && oldestFat !== null) ? latestFat - oldestFat : null
+
+  const avgWeight = weights.reduce((a, b) => a + b, 0) / weights.length
+  const avgFat = fats.length > 0 ? fats.reduce((a, b) => a + b, 0) / fats.length : null
+
+  return (
+    <div className="space-y-4">
+      {/* Header Info Grid */}
+      <div className="grid grid-cols-2 gap-3.5">
+        {/* Weight Insight */}
+        <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
+          <div className="space-y-1">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">體重趨勢分析</span>
+            <div className="flex items-baseline space-x-1">
+              <span className="text-xl font-black text-white">{latestWeight}</span>
+              <span className="text-xs text-slate-400 font-bold">kg</span>
+            </div>
+          </div>
+          <div className="mt-2.5 flex items-center space-x-1.5 text-xs font-bold">
+            {weightDiff < 0 ? (
+              <span className="text-emerald-400 flex items-center space-x-0.5">
+                <TrendingDown className="w-3.5 h-3.5 shrink-0" />
+                <span>累計減重 {Math.abs(weightDiff).toFixed(1)} kg</span>
+              </span>
+            ) : weightDiff > 0 ? (
+              <span className="text-amber-400 flex items-center space-x-0.5">
+                <TrendingUp className="w-3.5 h-3.5 shrink-0" />
+                <span>累計增加 {weightDiff.toFixed(1)} kg</span>
+              </span>
+            ) : (
+              <span className="text-slate-400">體重無起伏</span>
+            )}
+            <span className="text-[10px] text-slate-500 font-bold">
+              (均: {avgWeight.toFixed(1)} kg)
+            </span>
+          </div>
+        </div>
+
+        {/* Body Fat Insight */}
+        <div className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-4 flex flex-col justify-between">
+          <div className="space-y-1">
+            <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">體脂率趨勢分析</span>
+            <div className="flex items-baseline space-x-1">
+              <span className="text-xl font-black text-white">
+                {latestFat !== null ? `${latestFat}` : '--'}
+              </span>
+              <span className="text-xs text-slate-400 font-bold">%</span>
+            </div>
+          </div>
+          <div className="mt-2.5 flex items-center space-x-1.5 text-xs font-bold">
+            {fatDiff !== null ? (
+              fatDiff < 0 ? (
+                <span className="text-emerald-400 flex items-center space-x-0.5">
+                  <TrendingDown className="w-3.5 h-3.5 shrink-0" />
+                  <span>體脂減少 {Math.abs(fatDiff).toFixed(1)}%</span>
+                </span>
+              ) : fatDiff > 0 ? (
+                <span className="text-amber-400 flex items-center space-x-0.5">
+                  <TrendingUp className="w-3.5 h-3.5 shrink-0" />
+                  <span>體脂增加 {fatDiff.toFixed(1)}%</span>
+                </span>
+              ) : (
+                <span className="text-slate-400">體脂無起伏</span>
+              )
+            ) : (
+              <span className="text-slate-500">暫無足夠體脂紀錄</span>
+            )}
+            {avgFat !== null && (
+              <span className="text-[10px] text-slate-500 font-bold">
+                (均: {avgFat.toFixed(1)}%)
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* SVG Canvas Card */}
+      <div className="bg-slate-950/20 border border-slate-850 rounded-2xl p-4 relative overflow-hidden">
+        {/* Legend labels */}
+        <div className="flex justify-end items-center space-x-4 text-[9px] font-extrabold pb-2">
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-slate-300">體重 (kg)</span>
+          </div>
+          <div className="flex items-center space-x-1.5">
+            <span className="w-2.5 h-1 bg-purple-500 border border-purple-500 border-dashed rounded-full" />
+            <span className="text-slate-300">體脂 (%)</span>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto">
+          <svg viewBox={`0 0 ${width} ${height}`} className="w-full h-auto min-w-[320px]">
+            <defs>
+              {/* Blue Gradient Area for Weight Line */}
+              <linearGradient id="weightGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.0" />
+              </linearGradient>
+            </defs>
+
+            {/* Grid Line (Horizontal baseline) */}
+            <line 
+              x1={paddingX} 
+              y1={height - paddingY} 
+              x2={width - paddingX} 
+              y2={height - paddingY} 
+              className="stroke-slate-850 stroke-1"
+            />
+
+            {/* Weight Area Fill */}
+            {weightAreaD && (
+              <path d={weightAreaD} fill="url(#weightGrad)" />
+            )}
+
+            {/* Weight Line */}
+            {weightLineD && (
+              <path 
+                d={weightLineD} 
+                fill="none" 
+                stroke="#3b82f6" 
+                strokeWidth="2.5" 
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            )}
+
+            {/* Body Fat Line (Dashed) */}
+            {hasFatData && fatLineD && (
+              <path 
+                d={fatLineD} 
+                fill="none" 
+                stroke="#d946ef" 
+                strokeWidth="2" 
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeDasharray="4 4"
+              />
+            )}
+
+            {/* Dots and Labels for Weight */}
+            {weightPoints.map((p, i) => (
+              <g key={`w-dot-${i}`}>
+                {/* Dot */}
+                <circle 
+                  cx={p.x} 
+                  cy={p.y} 
+                  r="4.5" 
+                  fill="#1e293b" 
+                  stroke="#3b82f6" 
+                  strokeWidth="2.5" 
+                />
+                {/* Value text above dot */}
+                <text 
+                  x={p.x} 
+                  y={p.y - 12} 
+                  textAnchor="middle" 
+                  className="fill-blue-400 text-[10px] font-black"
+                >
+                  {p.val}
+                </text>
+                {/* Date label at X axis */}
+                <text 
+                  x={p.x} 
+                  y={height - 12} 
+                  textAnchor="middle" 
+                  className="fill-slate-500 text-[9px] font-bold"
+                >
+                  {p.date}
+                </text>
+              </g>
+            ))}
+
+            {/* Dots and Labels for Body Fat */}
+            {hasFatData && fatPoints.map((p, i) => (
+              <g key={`f-dot-${i}`}>
+                {/* Dot */}
+                <circle 
+                  cx={p.x} 
+                  cy={p.y} 
+                  r="4" 
+                  fill="#1e293b" 
+                  stroke="#d946ef" 
+                  strokeWidth="2" 
+                />
+                {/* Value text below dot */}
+                <text 
+                  x={p.x} 
+                  y={p.y + 16} 
+                  textAnchor="middle" 
+                  className="fill-purple-400 text-[9px] font-extrabold"
+                >
+                  {p.val}%
+                </text>
+              </g>
+            ))}
+          </svg>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalOpened }) => {
@@ -161,6 +458,14 @@ export const BiometricsTab: React.FC<BiometricsTabProps> = ({ autoOpen, onModalO
       {error && (
         <div className="p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl text-sm">
           {error}
+        </div>
+      )}
+
+      {/* Weight & Body Fat Trend Chart Card */}
+      {!fetching && logs.length > 0 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4 animate-fadeIn">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 pl-1">身體指標趨勢 (最近 7 次)</h3>
+          <WeightFatChart logs={logs} />
         </div>
       )}
 
